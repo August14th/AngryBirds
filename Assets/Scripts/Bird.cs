@@ -2,12 +2,36 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Bird : MonoBehaviour {
+[RequireComponent(typeof(Rigidbody2D))]
+public class Bird : MonoBehaviour
+{
+    public SlingShot SlingShot;
 
-	private void OnMouseDrag()
-	{
-		transform.position = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-		// 调整z轴坐标=0
-		transform.position -= new Vector3(0, 0, Camera.main.transform.position.z);
-	}
+    private Rigidbody2D _rigidBody;
+
+    private TrailRenderer _trailRenderer;
+
+    private void Start()
+    {
+        _rigidBody = GetComponent<Rigidbody2D>();
+        _trailRenderer = GetComponent<TrailRenderer>();
+        _rigidBody.isKinematic = true;
+        _trailRenderer.enabled = false;
+    }
+
+    private void OnMouseDrag()
+    {
+        Vector2 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        transform.position = pos;
+
+        SlingShot.DrawSlingShotLines();
+        SlingShot.DrawTrajectoryLine();
+    }
+
+    private void OnMouseUp()
+    {
+        _trailRenderer.enabled = true;
+        _rigidBody.isKinematic = false;
+        SlingShot.ThrowBird();
+    }
 }
