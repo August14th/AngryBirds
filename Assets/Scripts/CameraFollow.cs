@@ -36,6 +36,7 @@ public class CameraFollow : MonoBehaviour
 	public GoTween MoveToStartPos()
 	{
 		float duration = Vector2.Distance(transform.position, _startPos) / 10f;
+		if (duration < 0.1f) duration = 0.1f;
 		return transform.positionTo(duration, _startPos);
 	}
 }
