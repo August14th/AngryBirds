@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class CameraMove : MonoBehaviour
 {
-    private readonly float _minX = 0;
+    private const float MinX = -2;
 
-    private readonly float _maxX = 13;
+    private const float MaxX = 10;
 
     public SlingShot SlingShot;
 
@@ -30,7 +30,7 @@ public class CameraMove : MonoBehaviour
             {
                 Vector2 pos = Input.mousePosition;
                 Vector2 delta = (_previousPos - pos) * DragSpeed;
-                float newX = Mathf.Clamp(transform.position.x + delta.x, _minX, _maxX);
+                float newX = Mathf.Clamp(transform.position.x + delta.x, MinX, MaxX);
                 transform.position = new Vector3(newX, transform.position.y, transform.position.z);
                 _previousPos = pos;
             }

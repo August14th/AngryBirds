@@ -8,9 +8,9 @@ public class CameraFollow : MonoBehaviour
 
 	private GameObject _birdToFollow;
 
-	private const float MinX = 0;
+	private const float MinX = -2;
 	
-	private const float MaxX = 13;
+	private const float MaxX = 10;
 
 	// Use this for initialization
 	void Start ()
