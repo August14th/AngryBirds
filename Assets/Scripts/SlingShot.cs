@@ -46,17 +46,28 @@ public class SlingShot : MonoBehaviour
         RightLineRenderer.SetPosition(1, pos);
     }
 
+    public void PullBird(Vector2 newPos)
+    {
+        State = SlingShotState.Pulling;
+        var vector = newPos - _middle;
+        var distance = Mathf.Clamp(vector.sqrMagnitude, 0, 1.5f);
+        _birdToThrow.transform.position = distance * vector.normalized + _middle;
+        DrawSlingShotLines();
+        DrawTrajectoryLine();
+    }
+
 
     public void SetBirdToThrow(GameObject bird)
     {
-        State = SlingShotState.Pulling;
-        LeftLineRenderer.enabled = true;
-        RightLineRenderer.enabled = true;
-        _trajectoryLineRenderer.enabled = true;
-        bird.transform.position = BirdPosition.position;
+        State = SlingShotState.Waiting;
         _birdToThrow = bird;
-
-        DrawSlingShotLines();
+        bird.transform.positionTo(.1f, BirdPosition.position).setOnCompleteHandler(x =>
+        {
+            LeftLineRenderer.enabled = true;
+            RightLineRenderer.enabled = true;
+            _trajectoryLineRenderer.enabled = true;
+            DrawSlingShotLines();
+        });
     }
 
     public void ThrowBird()
@@ -67,6 +78,7 @@ public class SlingShot : MonoBehaviour
         _trajectoryLineRenderer.enabled = false;
         _trajectoryLineRenderer.positionCount = 0;
         _birdToThrow.GetComponent<Rigidbody2D>().velocity = ThrowSpeed();
+        Camera.main.GetComponent<CameraFollow>().StartFollow(_birdToThrow);
         _birdToThrow = null;
     }
 

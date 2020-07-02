@@ -7,6 +7,7 @@ public enum State
 public enum SlingShotState
 {
     Idle,
+    Waiting,
     Pulling,
     Flying
 }
