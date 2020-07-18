@@ -6,7 +6,9 @@ using UnityEngine.SceneManagement;
 
 public class GameManger : MonoBehaviour
 {
-    private List<GameObject> _birds;
+    public List<Bird> Birds;
+
+    public List<Pig> Pigs;
 
     private SlingShot _slingShot;
 
@@ -19,7 +21,6 @@ public class GameManger : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        _birds = new List<GameObject>(GameObject.FindGameObjectsWithTag("Bird"));
         _slingShot = FindObjectOfType<SlingShot>();
         _cameraFollow = GetComponent<CameraFollow>();
     }
@@ -29,7 +30,7 @@ public class GameManger : MonoBehaviour
         switch (_state)
         {
             case State.Idle:
-                if (Input.GetMouseButtonDown(0) && _birds.Count != 0)
+                if (Input.GetMouseButtonDown(0) && Birds.Count != 0)
                 {
                     _state = State.Playing;
                     TakeNextBird();
@@ -43,7 +44,7 @@ public class GameManger : MonoBehaviour
                     _cameraFollow.MoveToStartPos().setOnCompleteHandler(x =>
                     {
                         if (!TakeNextBird())
-                            SceneManager.LoadScene(1);
+                            SceneManager.LoadScene(0);
                     });
                 }
 
@@ -53,23 +54,32 @@ public class GameManger : MonoBehaviour
 
     private bool TakeNextBird()
     {
-        if (_birdIndex + 1 < _birds.Count)
+        if (_birdIndex + 1 < Birds.Count)
         {
             _birdIndex++;
-            var bird = _birds[_birdIndex];
-            _slingShot.SetBirdToThrow(bird);
+            var bird = Birds[_birdIndex];
+            _slingShot.SetBirdToThrow(bird.gameObject);
             return true;
         }
+
         return false;
     }
 
     private bool BricksBirdsPigsStoppedMoving()
     {
-        foreach (var bird in _birds)
+        foreach (var bird in Birds)
         {
             if (bird) // 判断是不是已经被destroy了
             {
-                if (bird.GetComponent<Bird>().Flying()) return false;
+                if (bird.Flying()) return false;
+            }
+        }
+
+        foreach (var pig in Pigs)
+        {
+            if (pig)
+            {
+                if (pig.GetComponent<Rigidbody2D>().velocity.magnitude > 0.05f) return false;
             }
         }
 

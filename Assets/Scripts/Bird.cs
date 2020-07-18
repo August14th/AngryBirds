@@ -43,7 +43,7 @@ public class Bird : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (_flying && _rigidBody.velocity.sqrMagnitude < 0.05f)
+        if (_flying && _rigidBody.velocity.magnitude < 0.05f)
         {
             StartCoroutine(DestroyAfter(1.5f));
         }
