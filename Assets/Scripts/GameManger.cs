@@ -58,11 +58,19 @@ public class GameManger : MonoBehaviour
                     else
                     {
                         BlackMask.SetActive(true);
-                        var _ = IsWin()
-                            ? Instantiate(WinPanel, Canvas.transform, false)
-                            : Instantiate(LosePanel, Canvas.transform, false);
+                        if (IsWin())
+                        {
+                            int counts = AliveBirds();
+                            var winPanel = Instantiate(WinPanel, Canvas.transform, false);
+                            winPanel.GetComponent<WinPanel>().SetStars(3 - counts + 1);
+                        }
+                        else
+                        {
+                            Instantiate(LosePanel, Canvas.transform, false);
+                        }
                     }
                 }
+
                 break;
         }
     }
@@ -106,5 +114,10 @@ public class GameManger : MonoBehaviour
     private bool IsWin()
     {
         return Pigs.Count(b => b) == 0;
+    }
+
+    private int AliveBirds()
+    {
+        return Birds.Count(b => b);
     }
 }
