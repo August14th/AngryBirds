@@ -467,6 +467,7 @@ MonoBehaviour:
   - {fileID: 1763771167}
   Pigs:
   - {fileID: 1441449690}
+  - {fileID: 2101133996}
   BlackMask: {fileID: 1190827533}
   LosePanel: {fileID: 1033521759902764, guid: 2add9761301ff0a49851154d5a3f69e1, type: 2}
   WinPanel: {fileID: 1137705098636410, guid: d163aa25e86dd414d9d4dda4425b2590, type: 2}
@@ -493,7 +494,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 707c5225872ae09458a5f6080205bbf1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SlingShot: {fileID: 269792424}
   DragSpeed: 0.01
 --- !u!4 &235092710 stripped
 Transform:
@@ -657,6 +657,7 @@ MonoBehaviour:
   LeftLineRenderer: {fileID: 2071246823}
   RightLineRenderer: {fileID: 2123080056}
   State: 0
+  CameraMove: {fileID: 218610993}
 --- !u!4 &269792425
 Transform:
   m_ObjectHideFlags: 0
@@ -1281,15 +1282,15 @@ Prefab:
       propertyPath: m_RootOrder
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1387430916386710, guid: 0439c3e3c188b1a45a5493bde667b367, type: 2}
+      propertyPath: m_Name
+      value: Bird-0
+      objectReference: {fileID: 0}
     - target: {fileID: 114136575357689646, guid: 0439c3e3c188b1a45a5493bde667b367,
         type: 2}
       propertyPath: SlingShot
       value: 
       objectReference: {fileID: 269792424}
-    - target: {fileID: 1387430916386710, guid: 0439c3e3c188b1a45a5493bde667b367, type: 2}
-      propertyPath: m_Name
-      value: Bird-0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 0439c3e3c188b1a45a5493bde667b367, type: 2}
   m_IsPrefabParent: 0
@@ -2612,6 +2613,12 @@ LineRenderer:
     generateLightingData: 0
   m_UseWorldSpace: 1
   m_Loop: 0
+--- !u!114 &2101133996 stripped
+MonoBehaviour:
+  m_PrefabParentObject: {fileID: 114898779577889542, guid: 1c2a645d4f436f44e8a2da3f3cebb7f9,
+    type: 2}
+  m_PrefabInternal: {fileID: 1510098161}
+  m_Script: {fileID: 11500000, guid: 758d518df738b2443bcf130a67973377, type: 3}
 --- !u!1 &2123080053
 GameObject:
   m_ObjectHideFlags: 0

@@ -4,11 +4,9 @@ using UnityEngine;
 
 public class CameraMove : MonoBehaviour
 {
-    private const float MinX = -2;
+    private const float MinX = 0;
 
     private const float MaxX = 10;
-
-    public SlingShot SlingShot;
 
     private Vector2 _previousPos;
 
@@ -19,21 +17,18 @@ public class CameraMove : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (SlingShot.State < SlingShotState.Pulling)
+        if (Input.GetMouseButtonDown(0))
         {
-            if (Input.GetMouseButtonDown(0))
-            {
-                _previousPos = Input.mousePosition;
-                _timeDragStart = Time.time;
-            }
-            else if (Input.GetMouseButton(0) && Time.time - _timeDragStart > 0.05f)
-            {
-                Vector2 pos = Input.mousePosition;
-                Vector2 delta = (_previousPos - pos) * DragSpeed;
-                float newX = Mathf.Clamp(transform.position.x + delta.x, MinX, MaxX);
-                transform.position = new Vector3(newX, transform.position.y, transform.position.z);
-                _previousPos = pos;
-            }
+            _previousPos = Input.mousePosition;
+            _timeDragStart = Time.time;
+        }
+        else if (Input.GetMouseButton(0) && Time.time - _timeDragStart > 0.05f)
+        {
+            Vector2 pos = Input.mousePosition;
+            Vector2 delta = (_previousPos - pos) * DragSpeed;
+            float newX = Mathf.Clamp(transform.position.x + delta.x, MinX, MaxX);
+            transform.position = new Vector3(newX, transform.position.y, transform.position.z);
+            _previousPos = pos;
         }
     }
 

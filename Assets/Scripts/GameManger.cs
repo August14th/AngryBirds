@@ -27,12 +27,15 @@ public class GameManger : MonoBehaviour
 
     public GameObject Canvas;
 
+    private CameraMove CameraMove;
+
     // Use this for initialization
     void Start()
     {
         _slingShot = FindObjectOfType<SlingShot>();
         _cameraFollow = GetComponent<CameraFollow>();
         BlackMask.SetActive(false);
+        CameraMove = GetComponent<CameraMove>();
     }
 
     private void Update()
@@ -77,11 +80,12 @@ public class GameManger : MonoBehaviour
 
     private void TakeNextBird()
     {
+        CameraMove.enabled = true;
         if (_birdIndex + 1 < Birds.Count)
         {
             _birdIndex++;
             var bird = Birds[_birdIndex];
-            _slingShot.SetBirdToThrow(bird.gameObject);
+            _slingShot.SetBirdToThrow(bird);
         }
     }
 

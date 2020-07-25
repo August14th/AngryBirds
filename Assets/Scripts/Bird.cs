@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
@@ -11,6 +12,8 @@ public class Bird : MonoBehaviour
 
     private TrailRenderer _trailRenderer;
 
+    private List<AudioSource> _audios;
+
     private bool _flying;
     
     private void Start()
@@ -19,11 +22,12 @@ public class Bird : MonoBehaviour
         _trailRenderer = GetComponent<TrailRenderer>();
         _rigidBody.isKinematic = true;
         _trailRenderer.enabled = false;
+        _audios = GetComponents<AudioSource>().ToList();
     }
 
     private void OnMouseDown()
     {
-        SlingShot.State = SlingShotState.Pulling;
+        SlingShot.StartPullingBird();
     }
 
     private void OnMouseDrag()
@@ -58,5 +62,29 @@ public class Bird : MonoBehaviour
     public bool Flying()
     {
         return _flying;
+    }
+    
+    
+    public void OnThrown(Vector2 speed)
+    {
+        _rigidBody.velocity = speed;
+        _audios.ForEach(f => f.enabled = false);
+        _audios[1].enabled = true;
+        
+    }
+
+    public GoTween OnSelected(Vector3 position)
+    {
+        _audios.ForEach(f => f.enabled = false);
+        _audios[0].enabled = true;
+
+        return transform.positionTo(.1f, position);
+    }
+
+
+    public void OnCollision()
+    {
+        _audios.ForEach(f => f.enabled = false);
+        _audios[2].enabled = true;
     }
 }

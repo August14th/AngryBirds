@@ -10,7 +10,7 @@ public class SlingShot : MonoBehaviour
 
     private Vector2 _middle;
 
-    private GameObject _birdToThrow;
+    private Bird _birdToThrow;
 
     public Transform BirdPosition;
 
@@ -24,12 +24,42 @@ public class SlingShot : MonoBehaviour
 
     public SlingShotState State = SlingShotState.Idle;
 
+    public CameraMove CameraMove;
+
     private void Start()
     {
         _trajectoryLineRenderer = GetComponent<LineRenderer>();
         _middle = (Left.position + Right.position) / 2;
         LeftLineRenderer.SetPosition(0, Left.position);
         RightLineRenderer.SetPosition(0, Right.position);
+    }
+    
+    public void SetBirdToThrow(Bird bird)
+    {
+        State = SlingShotState.Waiting;
+        _birdToThrow = bird;
+        bird.OnSelected(BirdPosition.position).setOnCompleteHandler(x =>
+        {
+            LeftLineRenderer.enabled = true;
+            RightLineRenderer.enabled = true;
+            _trajectoryLineRenderer.enabled = true;
+            DrawSlingShotLines();
+        });
+    }
+
+    public void StartPullingBird()
+    {
+        CameraMove.enabled = false;
+        State = SlingShotState.Pulling;
+    }
+    
+    public void PullBird(Vector2 newPos)
+    {
+        var vector = newPos - _middle;
+        var distance = Mathf.Clamp(vector.sqrMagnitude, 0, 1.5f);
+        _birdToThrow.transform.position = distance * vector.normalized + _middle;
+        DrawSlingShotLines();
+        DrawTrajectoryLine();
     }
 
     private Vector2 ThrowSpeed()
@@ -39,49 +69,25 @@ public class SlingShot : MonoBehaviour
     }
 
 
+    public void ThrowBird()
+    {
+        CameraMove.enabled = false;
+        State = SlingShotState.Flying;
+        LeftLineRenderer.enabled = false;
+        RightLineRenderer.enabled = false;
+        _trajectoryLineRenderer.enabled = false;
+        _trajectoryLineRenderer.positionCount = 0;
+        _birdToThrow.OnThrown(ThrowSpeed());
+        Camera.main.GetComponent<CameraFollow>().StartFollow(_birdToThrow.gameObject);
+        _birdToThrow = null;
+    }
+    
     public void DrawSlingShotLines()
     {
         var pos = _birdToThrow.transform.position;
         LeftLineRenderer.SetPosition(1, pos);
         RightLineRenderer.SetPosition(1, pos);
     }
-
-    public void PullBird(Vector2 newPos)
-    {
-        State = SlingShotState.Pulling;
-        var vector = newPos - _middle;
-        var distance = Mathf.Clamp(vector.sqrMagnitude, 0, 1.5f);
-        _birdToThrow.transform.position = distance * vector.normalized + _middle;
-        DrawSlingShotLines();
-        DrawTrajectoryLine();
-    }
-
-
-    public void SetBirdToThrow(GameObject bird)
-    {
-        State = SlingShotState.Waiting;
-        _birdToThrow = bird;
-        bird.transform.positionTo(.1f, BirdPosition.position).setOnCompleteHandler(x =>
-        {
-            LeftLineRenderer.enabled = true;
-            RightLineRenderer.enabled = true;
-            _trajectoryLineRenderer.enabled = true;
-            DrawSlingShotLines();
-        });
-    }
-
-    public void ThrowBird()
-    {
-        State = SlingShotState.Flying;
-        LeftLineRenderer.enabled = false;
-        RightLineRenderer.enabled = false;
-        _trajectoryLineRenderer.enabled = false;
-        _trajectoryLineRenderer.positionCount = 0;
-        _birdToThrow.GetComponent<Rigidbody2D>().velocity = ThrowSpeed();
-        Camera.main.GetComponent<CameraFollow>().StartFollow(_birdToThrow);
-        _birdToThrow = null;
-    }
-
 
     public void DrawTrajectoryLine()
     {

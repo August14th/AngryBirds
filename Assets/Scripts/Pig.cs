@@ -21,9 +21,11 @@ public class Pig : MonoBehaviour
         _renderer = GetComponent<SpriteRenderer>();
     }
 
-    private void OnCollisionEnter2D(Collision2D pig)
+    private void OnCollisionEnter2D(Collision2D bird)
     {
-        var speed = pig.relativeVelocity.magnitude;
+        if (!bird.gameObject.CompareTag("Bird")) return;
+        bird.gameObject.GetComponent<Bird>().OnCollision();
+        var speed = bird.relativeVelocity.magnitude;
         if (speed > MaxSpeed)
         {
             Destroy(gameObject);
