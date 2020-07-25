@@ -62,7 +62,9 @@
     <Compile Include="Assets\Scripts\CameraMove.cs" />
     <Compile Include="Assets\Scripts\Destroyer.cs" />
     <Compile Include="Assets\Scripts\GameManger.cs" />
+    <Compile Include="Assets\Scripts\MainUI.cs" />
     <Compile Include="Assets\Scripts\ParallaxScrolling.cs" />
+    <Compile Include="Assets\Scripts\PausePanel.cs" />
     <Compile Include="Assets\Scripts\Pig.cs" />
     <Compile Include="Assets\Scripts\SlingShot.cs" />
     <Compile Include="Assets\Scripts\State.cs" />
