@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - Bird
+  - Pig
+  - Brick
   layers:
   - Default
   - TransparentFX

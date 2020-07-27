@@ -9,7 +9,7 @@ public class Bird : MonoBehaviour
 {
     public GameManger GameManger;
 
-    private Rigidbody2D _rigidBody;
+    protected Rigidbody2D RigidBody;
     
     private List<AudioSource> _audios;
 
@@ -19,9 +19,9 @@ public class Bird : MonoBehaviour
 
     private void Start()
     {
-        _rigidBody = GetComponent<Rigidbody2D>();
+        RigidBody = GetComponent<Rigidbody2D>();
         _trailRenderer = GetComponent<TrailRenderer>();
-        _rigidBody.isKinematic = true;
+        RigidBody.isKinematic = true;
         _trailRenderer.enabled = false;
         _audios = GetComponents<AudioSource>().ToList();
     }
@@ -35,19 +35,29 @@ public class Bird : MonoBehaviour
     private void OnMouseUp()
     {
         _trailRenderer.enabled = true;
-        _rigidBody.isKinematic = false;
         GameManger.ThrowBird(this);
         _fly = true;
     }
 
     private void FixedUpdate()
     {
-        if (_fly && _rigidBody.velocity.magnitude < 0.05f)
+        if (_fly && RigidBody.velocity.magnitude < 0.05f)
         {
             StartCoroutine(DestroyAfter(0.5f));
         }
     }
-    
+
+    private void Update()
+    {
+        if (IsFlying())
+        {
+            if (Input.GetMouseButtonDown(0))
+            {
+                CastSkill();
+            }
+        }
+    }
+
     IEnumerator DestroyAfter(float seconds)
     {
         yield return new WaitForSeconds(seconds);
@@ -57,7 +67,8 @@ public class Bird : MonoBehaviour
 
     public void SetSpeed(Vector2 speed)
     {
-        _rigidBody.velocity = speed;
+        RigidBody.isKinematic = false;
+        RigidBody.velocity = speed;
     }
     
     public void MoveTo(Vector2 dest)
@@ -79,5 +90,10 @@ public class Bird : MonoBehaviour
     public bool IsFlying()
     {
         return _fly;
+    }
+
+    protected virtual void CastSkill()
+    {
+        
     }
 }

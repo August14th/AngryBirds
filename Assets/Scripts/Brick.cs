@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
-public class Brick : MonoBehaviour
+public class Brick : Enemy
 {
 
 	public float Health = 100;
@@ -13,12 +13,13 @@ public class Brick : MonoBehaviour
 		var otherRigidBody = other.gameObject.GetComponent<Rigidbody2D>();
 		if (otherRigidBody == null) return;
 		float damage = otherRigidBody.velocity.magnitude * 10;
-		if (damage >= 10)
-		{
-			// GetComponent<AudioSource>().Play();
-		}
-
 		Health -= damage;
-		if (Health <= 0) Destroy(gameObject);
+		if (Health <= 0) Dead();
+	}
+
+
+	public override void Dead()
+	{
+		Destroy(gameObject);
 	}
 }
