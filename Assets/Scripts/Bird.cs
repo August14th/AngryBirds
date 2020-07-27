@@ -2,20 +2,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Events;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class Bird : MonoBehaviour
 {
-    public SlingShot SlingShot;
+    public GameManger GameManger;
 
     private Rigidbody2D _rigidBody;
+    
+    private List<AudioSource> _audios;
 
     private TrailRenderer _trailRenderer;
 
-    private List<AudioSource> _audios;
+    private bool _fly;
 
-    private bool _flying;
-    
     private void Start()
     {
         _rigidBody = GetComponent<Rigidbody2D>();
@@ -25,66 +26,58 @@ public class Bird : MonoBehaviour
         _audios = GetComponents<AudioSource>().ToList();
     }
 
-    private void OnMouseDown()
-    {
-        SlingShot.StartPullingBird();
-    }
-
     private void OnMouseDrag()
     {
         Vector2 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        SlingShot.PullBird(pos);
+        GameManger.DragBird(this, pos);
     }
 
     private void OnMouseUp()
     {
         _trailRenderer.enabled = true;
         _rigidBody.isKinematic = false;
-        // GetComponent<AudioSource>().Play();
-        _flying = true;
-        SlingShot.ThrowBird();
+        GameManger.ThrowBird(this);
+        _fly = true;
     }
 
     private void FixedUpdate()
     {
-        if (_flying && _rigidBody.velocity.magnitude < 0.05f)
+        if (_fly && _rigidBody.velocity.magnitude < 0.05f)
         {
-            StartCoroutine(DestroyAfter(1.5f));
+            StartCoroutine(DestroyAfter(0.5f));
         }
     }
     
     IEnumerator DestroyAfter(float seconds)
     {
         yield return new WaitForSeconds(seconds);
+        _fly = false;
         Destroy(gameObject);
     }
 
-    public bool Flying()
-    {
-        return _flying;
-    }
-    
-    
-    public void OnThrown(Vector2 speed)
+    public void SetSpeed(Vector2 speed)
     {
         _rigidBody.velocity = speed;
-        _audios.ForEach(f => f.enabled = false);
-        _audios[1].enabled = true;
-        
+    }
+    
+    public void MoveTo(Vector2 dest)
+    {
+        transform.position = dest;
     }
 
-    public GoTween OnSelected(Vector3 position)
+    public void MoveTo(Vector2 dest, UnityAction onCompleted)
     {
-        _audios.ForEach(f => f.enabled = false);
-        _audios[0].enabled = true;
-
-        return transform.positionTo(.1f, position);
+        transform.positionTo(.1f, dest).setOnCompleteHandler(x => onCompleted());
     }
 
-
-    public void OnCollision()
+    public void PlaySound(int idx)
     {
         _audios.ForEach(f => f.enabled = false);
-        _audios[2].enabled = true;
+        _audios[idx].enabled = true;
+    }
+
+    public bool IsFlying()
+    {
+        return _fly;
     }
 }

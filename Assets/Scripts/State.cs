@@ -1,13 +1,9 @@
 public enum State
 {
     Idle,
-    Playing
-}
-
-public enum SlingShotState
-{
-    Idle,
+    Taking,
     Waiting,
     Pulling,
-    Flying
+    Flying,
+    Over
 }

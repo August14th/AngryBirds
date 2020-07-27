@@ -5,100 +5,88 @@ using UnityEngine;
 
 public class SlingShot : MonoBehaviour
 {
-
-    public Transform Left, Right;
-
-    private Vector2 _middle;
-
-    private Bird _birdToThrow;
-
-    public Transform BirdPosition;
-
-    private LineRenderer _trajectoryLineRenderer;
-
     public float Speed;
+    
+    public Transform Left, Right;
 
     public LineRenderer LeftLineRenderer;
 
     public LineRenderer RightLineRenderer;
 
-    public SlingShotState State = SlingShotState.Idle;
+    private Bird _bird;
+    
+    private Vector2 _middle;
 
-    public CameraMove CameraMove;
+    public Transform BirdPosition;
+
+    private LineRenderer _trajectoryLineRenderer;
 
     private void Start()
     {
-        _trajectoryLineRenderer = GetComponent<LineRenderer>();
         _middle = (Left.position + Right.position) / 2;
-        LeftLineRenderer.SetPosition(0, Left.position);
-        RightLineRenderer.SetPosition(0, Right.position);
+        LeftLineRenderer.enabled = RightLineRenderer.enabled = false;
+        _trajectoryLineRenderer = GetComponent<LineRenderer>();
+        LeftLineRenderer.enabled = false;
     }
     
-    public void SetBirdToThrow(Bird bird)
+    public void Take(Bird bird)
     {
-        State = SlingShotState.Waiting;
-        _birdToThrow = bird;
-        bird.OnSelected(BirdPosition.position).setOnCompleteHandler(x =>
+        bird.PlaySound(0);
+        bird.MoveTo(BirdPosition.position, () =>
         {
-            LeftLineRenderer.enabled = true;
-            RightLineRenderer.enabled = true;
-            _trajectoryLineRenderer.enabled = true;
+            _bird = bird;
             DrawSlingShotLines();
         });
     }
 
-    public void StartPullingBird()
+    public void DragBird(Vector2 newPos)
     {
-        CameraMove.enabled = false;
-        State = SlingShotState.Pulling;
-    }
-    
-    public void PullBird(Vector2 newPos)
-    {
+        _bird.MoveTo(newPos);
         var vector = newPos - _middle;
-        var distance = Mathf.Clamp(vector.sqrMagnitude, 0, 1.5f);
-        _birdToThrow.transform.position = distance * vector.normalized + _middle;
+        var distance = Mathf.Clamp(vector.magnitude, 0, 1.5f);
+        _bird.transform.position = distance * vector.normalized + _middle;
         DrawSlingShotLines();
         DrawTrajectoryLine();
     }
 
     private Vector2 ThrowSpeed()
     {
-        Vector2 pos = _birdToThrow.transform.position;
+        Vector2 pos = _bird.transform.position;
         return Speed * (_middle - pos); // 指向中心点
     }
 
 
     public void ThrowBird()
     {
-        CameraMove.enabled = false;
-        State = SlingShotState.Flying;
         LeftLineRenderer.enabled = false;
         RightLineRenderer.enabled = false;
         _trajectoryLineRenderer.enabled = false;
         _trajectoryLineRenderer.positionCount = 0;
-        _birdToThrow.OnThrown(ThrowSpeed());
-        Camera.main.GetComponent<CameraFollow>().StartFollow(_birdToThrow.gameObject);
-        _birdToThrow = null;
+        _bird.PlaySound(1);
+        _bird.SetSpeed(ThrowSpeed());
     }
     
     public void DrawSlingShotLines()
     {
-        var pos = _birdToThrow.transform.position;
+        var pos = _bird.transform.position;
+        LeftLineRenderer.enabled = true;
+        RightLineRenderer.enabled = true;
+        LeftLineRenderer.SetPosition(0, Left.position);
         LeftLineRenderer.SetPosition(1, pos);
+        RightLineRenderer.SetPosition(0, Right.position);
         RightLineRenderer.SetPosition(1, pos);
     }
 
     public void DrawTrajectoryLine()
     {
-        var gravity = _birdToThrow.GetComponent<Rigidbody2D>().gravityScale * Physics2D.gravity; // 重力
+        _trajectoryLineRenderer.enabled = true;
         var segmentCount = 15;
         Vector2[] segments = new Vector2[segmentCount];
-        segments[0] = _birdToThrow.transform.position;
+        segments[0] = _bird.transform.position;
         for (var i = 1; i < segmentCount; i++)
         {
             var time = i * Time.fixedDeltaTime * 5;
-            segments[i] = segments[0] + ThrowSpeed() * time + 0.5f * gravity * Mathf.Pow(time, 2); // vt + 1/2at2
+            segments[i] = segments[0] + ThrowSpeed() * time + 0.5f * Physics2D.gravity * Mathf.Pow(time, 2); // vt + 1/2at2
         }
 
         _trajectoryLineRenderer.positionCount = segmentCount;

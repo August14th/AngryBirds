@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
+using NUnit.Framework.Interfaces;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -11,13 +13,7 @@ public class GameManger : MonoBehaviour
 
     public List<Pig> Pigs;
 
-    private SlingShot _slingShot;
-
-    private State _state;
-
-    private int _birdIndex = -1;
-
-    private CameraFollow _cameraFollow;
+    public SlingShot SlingShot;
 
     public GameObject BlackMask;
 
@@ -27,15 +23,20 @@ public class GameManger : MonoBehaviour
 
     public GameObject Canvas;
 
-    private CameraMove CameraMove;
+    private State _state;
+
+    private int _birdIndex = -1;
+
+    private CameraMove _cameraMove;
+
+    private CameraFollow _cameraFollow;
 
     // Use this for initialization
     void Start()
     {
-        _slingShot = FindObjectOfType<SlingShot>();
-        _cameraFollow = GetComponent<CameraFollow>();
         BlackMask.SetActive(false);
-        CameraMove = GetComponent<CameraMove>();
+        _cameraMove = GetComponent<CameraMove>();
+        _cameraFollow = GetComponent<CameraFollow>();
     }
 
     private void Update()
@@ -43,35 +44,13 @@ public class GameManger : MonoBehaviour
         switch (_state)
         {
             case State.Idle:
-                if (Input.GetMouseButtonDown(0) && Birds.Count != 0)
-                {
-                    _state = State.Playing;
-                    TakeNextBird();
-                }
-
+                if (Input.GetMouseButtonDown(0)) TakeNextBird();
                 break;
-            case State.Playing:
-                if (_slingShot.State == SlingShotState.Flying && BricksBirdsPigsStoppedMoving())
+            case State.Flying:
+                if (BricksBirdsPigsStoppedMoving())
                 {
-                    _slingShot.State = SlingShotState.Idle;
-                    if (!IsOver())
-                    {
-                        _cameraFollow.MoveToStartPos().setOnCompleteHandler(x => { TakeNextBird(); });
-                    }
-                    else
-                    {
-                        BlackMask.SetActive(true);
-                        if (IsWin())
-                        {
-                            int counts = AliveBirds();
-                            var winPanel = Instantiate(WinPanel, Canvas.transform, false);
-                            winPanel.GetComponent<WinPanel>().SetStars(3 - counts + 1);
-                        }
-                        else
-                        {
-                            Instantiate(LosePanel, Canvas.transform, false);
-                        }
-                    }
+                    if (!IsOver()) TakeNextBird();
+                    else Settle();
                 }
 
                 break;
@@ -80,48 +59,69 @@ public class GameManger : MonoBehaviour
 
     private void TakeNextBird()
     {
-        CameraMove.enabled = true;
-        if (_birdIndex + 1 < Birds.Count)
+        _birdIndex++;
+        var bird = Birds[_birdIndex];
+        _cameraFollow.MoveToStartPos(() =>
         {
-            _birdIndex++;
-            var bird = Birds[_birdIndex];
-            _slingShot.SetBirdToThrow(bird);
-        }
+            SlingShot.Take(bird);
+            _cameraMove.enabled = true;
+            _state = State.Waiting;
+        });
+        _state = State.Taking;
+    }
+
+    public void DragBird(Bird bird, Vector2 newPos)
+    {
+        if (bird != Birds[_birdIndex]) return;
+        if (_cameraMove.enabled) _cameraMove.enabled = false;
+        SlingShot.DragBird(newPos);
+        _state = State.Pulling;
+    }
+
+    public void ThrowBird(Bird bird)
+    {
+        if (bird != Birds[_birdIndex]) return;
+        if (_cameraMove.enabled) _cameraMove.enabled = false;
+        _cameraFollow.StartFollow(bird.gameObject);
+        SlingShot.ThrowBird();
+        _state = State.Flying;
     }
 
     private bool BricksBirdsPigsStoppedMoving()
     {
         foreach (var bird in Birds)
         {
-            if (bird) // 判断是不是已经被destroy了
-            {
-                if (bird.Flying()) return false;
-            }
+            // 判断是不是已经被destroy了
+            if (bird && bird.IsFlying()) return false;
         }
 
         foreach (var pig in Pigs)
         {
-            if (pig)
-            {
-                if (pig.GetComponent<Rigidbody2D>().velocity.magnitude > 0.05f) return false;
-            }
+            if (pig && pig.IsMoving()) return false;
         }
 
         return true;
     }
 
+    private void Settle()
+    {
+        _state = State.Over;
+        BlackMask.SetActive(true);
+        var isWin = Pigs.Count(b => b) == 0;
+        if (isWin)
+        {
+            var aliveBirds = Birds.Count(b => b);
+            var winPanel = Instantiate(WinPanel, Canvas.transform, false);
+            winPanel.GetComponent<WinPanel>().SetStars(aliveBirds + 1);
+        }
+        else
+        {
+            Instantiate(LosePanel, Canvas.transform, false);
+        }
+    }
+
     private bool IsOver()
     {
         return Birds.Count(b => b) == 0 || Pigs.Count(b => b) == 0;
-    }
-
-    private bool IsWin()
-    {
-        return Pigs.Count(b => b) == 0;
-    }
-
-    private int AliveBirds()
-    {
-        return Birds.Count(b => b);
     }
 }

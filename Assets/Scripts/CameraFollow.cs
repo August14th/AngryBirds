@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class CameraFollow : MonoBehaviour
 {
@@ -23,7 +24,7 @@ public class CameraFollow : MonoBehaviour
 		if (_birdToFollow)
 		{
 			var birdPos = _birdToFollow.transform.position;
-			float x = Mathf.Clamp(birdPos.x, MinX, MaxX);
+			float x = Mathf.Clamp(birdPos.x, transform.position.x, MaxX);
 			transform.position = new Vector3(x, _startPos.y, _startPos.z);
 		}
 	}
@@ -33,10 +34,10 @@ public class CameraFollow : MonoBehaviour
 		_birdToFollow = bird;
 	}
 
-	public GoTween MoveToStartPos()
+	public void MoveToStartPos(UnityAction onCompleted)
 	{
 		float duration = Vector2.Distance(transform.position, _startPos) / 10f;
 		if (duration < 0.1f) duration = 0.1f;
-		return transform.positionTo(duration, _startPos);
+		transform.positionTo(duration, _startPos).setOnCompleteHandler(x => {onCompleted.Invoke();});
 	}
 }
