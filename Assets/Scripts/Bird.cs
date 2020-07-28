@@ -1,8 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Events;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class Bird : MonoBehaviour
@@ -76,7 +76,7 @@ public class Bird : MonoBehaviour
         transform.position = dest;
     }
 
-    public void MoveTo(Vector2 dest, UnityAction onCompleted)
+    public void MoveTo(Vector2 dest, Action onCompleted)
     {
         transform.positionTo(.1f, dest).setOnCompleteHandler(x => onCompleted());
     }

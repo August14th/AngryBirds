@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -34,10 +35,10 @@ public class CameraFollow : MonoBehaviour
 		_birdToFollow = bird;
 	}
 
-	public void MoveToStartPos(UnityAction onCompleted)
+	public void MoveToStartPos(Action onCompleted)
 	{
 		float duration = Vector2.Distance(transform.position, _startPos) / 10f;
 		if (duration < 0.1f) duration = 0.1f;
-		transform.positionTo(duration, _startPos).setOnCompleteHandler(x => {onCompleted.Invoke();});
+		transform.positionTo(duration, _startPos).setOnCompleteHandler(x => { onCompleted(); });
 	}
 }
