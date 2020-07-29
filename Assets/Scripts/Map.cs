@@ -13,4 +13,25 @@ public class Map : MonoBehaviour
 
 	public Text StarNeedText;
 
+	public void SetStatus(int stars, GameObject levelPanel, GameObject parent)
+	{
+		if (stars < StarNeed)
+		{
+			StarNeedText.text = stars + "/" + StarNeed;
+		}
+		else
+		{
+			Lock.gameObject.SetActive(false);
+			StarNeedText.gameObject.SetActive(false);
+			
+			var button = GetComponent<Button>();
+			button.onClick.AddListener(() =>
+			{
+				parent.SetActive(false);
+				var go = Instantiate(levelPanel, transform.root, false);
+				go.GetComponent<LevelPanel>().ShowLevels(parent, Index, 12);
+			});
+		}
+	}
+
 }

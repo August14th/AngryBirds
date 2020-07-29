@@ -109,13 +109,15 @@ public class GameManger : MonoBehaviour
         var isWin = Pigs.Count(b => b) == 0;
         if (isWin)
         {
-            var stars = Birds.Count(b => b);
+            var stars = Birds.Count(b => b) + 1;
             var winPanel = Instantiate(WinPanel, Canvas.transform, false);
             winPanel.GetComponent<WinPanel>().SetStars(stars);
             var lastStars = PlayerPrefs.GetInt(Level);
             if (lastStars < stars)
             {
                 PlayerPrefs.SetInt(Level, stars);
+                var totalStars = PlayerPrefs.GetInt("Stars");
+                PlayerPrefs.SetInt("Stars", totalStars + stars - lastStars);
             }
         }
         else
