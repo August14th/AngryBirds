@@ -547,6 +547,7 @@ MonoBehaviour:
   LosePanel: {fileID: 1033521759902764, guid: 2add9761301ff0a49851154d5a3f69e1, type: 2}
   WinPanel: {fileID: 1137705098636410, guid: d163aa25e86dd414d9d4dda4425b2590, type: 2}
   Canvas: {fileID: 85893393}
+  Level: 1-1
 --- !u!114 &218610992
 MonoBehaviour:
   m_ObjectHideFlags: 0

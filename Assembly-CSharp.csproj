@@ -69,11 +69,11 @@
     <Compile Include="Assets\Scripts\LevelPanel.cs" />
     <Compile Include="Assets\Scripts\MainUI.cs" />
     <Compile Include="Assets\Scripts\Map.cs" />
+    <Compile Include="Assets\Scripts\MapPanel.cs" />
     <Compile Include="Assets\Scripts\ParallaxScrolling.cs" />
     <Compile Include="Assets\Scripts\PausePanel.cs" />
     <Compile Include="Assets\Scripts\Pig.cs" />
     <Compile Include="Assets\Scripts\SlingShot.cs" />
-    <Compile Include="Assets\Scripts\StackPanel.cs" />
     <Compile Include="Assets\Scripts\State.cs" />
     <Compile Include="Assets\Scripts\WinPanel.cs" />
     <Compile Include="Assets\Scripts\YellowBird.cs" />

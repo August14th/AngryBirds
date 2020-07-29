@@ -9,6 +9,8 @@ public class WinPanel : MonoBehaviour
 
 	public Button RetryBtn;
 
+	public Button MainBtn;
+
 	public GameObject Star1;
 
 	public GameObject Star2;
@@ -19,17 +21,12 @@ public class WinPanel : MonoBehaviour
 
 
 	// Use this for initialization
-	void Start () {
-	
-		RetryBtn.onClick.AddListener(Retry);
-		
-	}
-
-
-	private void Retry()
+	void Start()
 	{
-		SceneManager.LoadScene(0);
+		RetryBtn.onClick.AddListener(() => SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex));
+		MainBtn.onClick.AddListener(() => SceneManager.LoadScene("Main"));
 	}
+
 
 	public void SetStars(int stars)
 	{

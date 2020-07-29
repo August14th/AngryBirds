@@ -561,6 +561,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   RetryBtn: {fileID: 114149182742080930}
+  MainBtn: {fileID: 114526724483758572}
   Star1: {fileID: 1364954753050998}
   Star2: {fileID: 1155623291255002}
   Star3: {fileID: 1231998560026316}

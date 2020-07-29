@@ -17,8 +17,9 @@ public class Level : MonoBehaviour
     public Sprite Lock;
 
     // Use this for initialization
-    public void SetStatus(int level, bool open, int stars)
+    public void SetStatus(int map, int level, bool open, int stars)
     {
+        var sceneName = map + "-" + level;
         if (open)
         {
             LevelTxt.text = level.ToString();
@@ -38,7 +39,7 @@ public class Level : MonoBehaviour
             }
             GetComponent<Button>().onClick.AddListener(() =>
             {
-                SceneManager.LoadScene(1);
+                SceneManager.LoadScene(sceneName);
             });
         }
         else
@@ -46,11 +47,5 @@ public class Level : MonoBehaviour
             LevelTxt.gameObject.SetActive(false);
             GetComponent<Image>().overrideSprite = Lock;
         }
-    }
-
-
-    // Update is called once per frame
-    void Update()
-    {
     }
 }

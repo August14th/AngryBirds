@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class LevelPanel : StackPanel
+public class LevelPanel : MonoBehaviour
 {
 	public GameObject LevelPrefab;
 
@@ -12,16 +12,20 @@ public class LevelPanel : StackPanel
 
 	public Button Return;
 
+	private GameObject _parent;
+
 	private void Start()
 	{
 		Return.onClick.AddListener(() =>
 		{
 			Destroy(gameObject);
+			_parent.SetActive(true);
 		});
 	}
 
-	public void ShowLevels(int map, int levels)
+	public void ShowLevels(GameObject parent, int map, int levels)
 	{
+		_parent = parent;
 		var closed = false;
 
 		for (var i = 1; i <= levels; i++)
@@ -33,12 +37,12 @@ public class LevelPanel : StackPanel
 			if (!closed)
 			{
 				var stars = PlayerPrefs.GetInt(levelName, 0);
-				level.SetStatus(i, true, stars);
+				level.SetStatus(map, i, true, stars);
 				if (stars == 0) closed = true;
 			}
 			else
 			{
-				level.SetStatus(i, false, 0);
+				level.SetStatus(map, i, false, 0);
 			}
 		}
 	}

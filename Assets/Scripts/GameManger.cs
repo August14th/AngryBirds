@@ -1,11 +1,8 @@
-﻿using System.CodeDom;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using NUnit.Framework.Interfaces;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class GameManger : MonoBehaviour
 {
@@ -30,6 +27,8 @@ public class GameManger : MonoBehaviour
     private CameraMove _cameraMove;
 
     private CameraFollow _cameraFollow;
+
+    public String Level;
 
     // Use this for initialization
     void Start()
@@ -110,9 +109,14 @@ public class GameManger : MonoBehaviour
         var isWin = Pigs.Count(b => b) == 0;
         if (isWin)
         {
-            var aliveBirds = Birds.Count(b => b);
+            var stars = Birds.Count(b => b);
             var winPanel = Instantiate(WinPanel, Canvas.transform, false);
-            winPanel.GetComponent<WinPanel>().SetStars(aliveBirds + 1);
+            winPanel.GetComponent<WinPanel>().SetStars(stars);
+            var lastStars = PlayerPrefs.GetInt(Level);
+            if (lastStars < stars)
+            {
+                PlayerPrefs.SetInt(Level, stars);
+            }
         }
         else
         {
