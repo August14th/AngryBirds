@@ -10,12 +10,12 @@ public class Map : MonoBehaviour
 	public Image Lock;
 
 	public int StarNeed;
-	
-	public Levels Levels;
 
 	public Text StarNeedText;
 
 	private Button _button;
+
+	public GameObject LevelPanel;
 
 	// Use this for initialization
 	void Start()
@@ -33,8 +33,8 @@ public class Map : MonoBehaviour
 			_button = GetComponent<Button>();
 			_button.onClick.AddListener(() =>
 			{
-				transform.parent.gameObject.SetActive(false);
-				Levels.ShowLevels(Index, 12);
+				var levelPanel = Instantiate(LevelPanel, transform.root, false);
+				levelPanel.GetComponent<LevelPanel>().ShowLevels(Index, 12);
 			});
 		}
 	}

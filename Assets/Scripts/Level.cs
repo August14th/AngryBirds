@@ -12,17 +12,16 @@ public class Level : MonoBehaviour
 
     public Image Star3;
 
-    public Image Lock;
-
     public Text LevelTxt;
+
+    public Sprite Lock;
 
     // Use this for initialization
     public void SetStatus(int level, bool open, int stars)
     {
-        LevelTxt.text = level.ToString();
-        Lock.gameObject.SetActive(!open);
         if (open)
         {
+            LevelTxt.text = level.ToString();
             if (stars >= 1)
             {
                 Star1.gameObject.SetActive(true);
@@ -41,6 +40,11 @@ public class Level : MonoBehaviour
             {
                 SceneManager.LoadScene(1);
             });
+        }
+        else
+        {
+            LevelTxt.gameObject.SetActive(false);
+            GetComponent<Image>().overrideSprite = Lock;
         }
     }
 
