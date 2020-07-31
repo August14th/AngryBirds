@@ -3,9 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 [RequireComponent(typeof(Rigidbody2D))]
-public class Bird : MonoBehaviour
+public class Bird : MonoBehaviour, IDragHandler, IEndDragHandler
 {
     public GameManger GameManger;
 
@@ -15,7 +16,7 @@ public class Bird : MonoBehaviour
 
     private TrailRenderer _trailRenderer;
 
-    private bool _fly;
+    private int _state;
 
     private void Start()
     {
@@ -26,22 +27,24 @@ public class Bird : MonoBehaviour
         _audios = GetComponents<AudioSource>().ToList();
     }
 
-    private void OnMouseDrag()
+    public void OnDrag(PointerEventData eventData)
     {
+        if (_state != 1) return;
         Vector2 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         GameManger.DragBird(this, pos);
     }
-
-    private void OnMouseUp()
+    
+    public void OnEndDrag(PointerEventData eventData)
     {
+        if (_state != 1) return;
         _trailRenderer.enabled = true;
         GameManger.ThrowBird(this);
-        _fly = true;
+        _state = 2;
     }
 
     private void FixedUpdate()
     {
-        if (_fly && RigidBody.velocity.magnitude < 0.05f)
+        if (_state == 2 && RigidBody.velocity.magnitude < 0.05f)
         {
             StartCoroutine(DestroyAfter(0.5f));
         }
@@ -58,10 +61,15 @@ public class Bird : MonoBehaviour
         }
     }
 
+    public void PutOnSlingShot(SlingShot slingShot)
+    {
+        _state = 1;
+        slingShot.Take(this);
+    }
+
     IEnumerator DestroyAfter(float seconds)
     {
         yield return new WaitForSeconds(seconds);
-        _fly = false;
         Destroy(gameObject);
     }
 
@@ -89,7 +97,7 @@ public class Bird : MonoBehaviour
 
     public bool IsFlying()
     {
-        return _fly;
+        return _state == 2;
     }
 
     protected virtual void CastSkill()

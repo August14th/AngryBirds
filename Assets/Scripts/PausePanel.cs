@@ -31,7 +31,13 @@ public class PausePanel : MonoBehaviour
 
 	public void Hide()
 	{
+		Time.timeScale = 1;
 		_animator.SetBool("Show", false);
+	}
+
+	public void OnShowEnd()
+	{
+		Time.timeScale = 0;
 	}
 
 	public void OnHideEnd()

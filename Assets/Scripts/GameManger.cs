@@ -33,7 +33,7 @@ public class GameManger : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        BlackMask.SetActive(false);
+        // BlackMask.SetActive(false);
         _cameraMove = GetComponent<CameraMove>();
         _cameraFollow = GetComponent<CameraFollow>();
     }
@@ -62,7 +62,7 @@ public class GameManger : MonoBehaviour
         var bird = Birds[_birdIndex];
         _cameraFollow.MoveToStartPos(() =>
         {
-            SlingShot.Take(bird);
+            bird.PutOnSlingShot(SlingShot);
             _cameraMove.enabled = true;
             _state = State.Waiting;
         });
