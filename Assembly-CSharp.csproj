@@ -55,6 +55,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\SceneLoader.cs" />
     <Compile Include="Assets\Scripts\Bird.cs" />
     <Compile Include="Assets\Scripts\BlackBird.cs" />
     <Compile Include="Assets\Scripts\Boom.cs" />
@@ -77,6 +78,7 @@
     <Compile Include="Assets\Scripts\State.cs" />
     <Compile Include="Assets\Scripts\WinPanel.cs" />
     <Compile Include="Assets\Scripts\YellowBird.cs" />
+    <None Include="Assets\codeandweb.com\Readme.txt" />
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>D:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.CoreModule.dll</HintPath>
     </Reference>

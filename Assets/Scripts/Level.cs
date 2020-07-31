@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class Level : MonoBehaviour
@@ -39,7 +38,7 @@ public class Level : MonoBehaviour
             }
             GetComponent<Button>().onClick.AddListener(() =>
             {
-                SceneManager.LoadScene(sceneName);
+                transform.root.GetComponent<SceneLoader>().Load(sceneName);
             });
         }
         else
