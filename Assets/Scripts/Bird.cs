@@ -3,10 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 [RequireComponent(typeof(Rigidbody2D))]
-public class Bird : MonoBehaviour, IDragHandler, IEndDragHandler
+public class Bird : GameBehaviour
 {
     public GameManger GameManger;
 
@@ -27,15 +26,17 @@ public class Bird : MonoBehaviour, IDragHandler, IEndDragHandler
         _audios = GetComponents<AudioSource>().ToList();
     }
 
-    public void OnDrag(PointerEventData eventData)
+    private void OnMouseDrag()
     {
+        if (IsOnGUI()) return;
         if (_state != 1) return;
         Vector2 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         GameManger.DragBird(this, pos);
     }
-    
-    public void OnEndDrag(PointerEventData eventData)
+
+    private void OnMouseUp()
     {
+        if (IsOnGUI()) return;
         if (_state != 1) return;
         _trailRenderer.enabled = true;
         GameManger.ThrowBird(this);

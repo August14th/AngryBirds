@@ -12,8 +12,6 @@ public class GameManger : MonoBehaviour
 
     public SlingShot SlingShot;
 
-    public GameObject BlackMask;
-
     public GameObject LosePanel;
 
     public GameObject WinPanel;
@@ -33,7 +31,6 @@ public class GameManger : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        // BlackMask.SetActive(false);
         _cameraMove = GetComponent<CameraMove>();
         _cameraFollow = GetComponent<CameraFollow>();
     }
@@ -105,7 +102,6 @@ public class GameManger : MonoBehaviour
     private void Settle()
     {
         _state = State.Over;
-        BlackMask.SetActive(true);
         var isWin = Pigs.Count(b => b) == 0;
         if (isWin)
         {

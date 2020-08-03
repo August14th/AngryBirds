@@ -8,7 +8,7 @@ public class MainUI : MonoBehaviour
 
     public Button PauseBtn;
 
-    public PausePanel PausePanel;
+    public GameObject PausePanel;
 
 
     private void Start()
@@ -20,7 +20,7 @@ public class MainUI : MonoBehaviour
     private void ShowPausePanel()
     {
         PauseBtn.gameObject.SetActive(false);
-        PausePanel.Show();
+        Instantiate(PausePanel, transform, false);
     }
 
     public void ShowPauseBtn()

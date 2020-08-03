@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Level : MonoBehaviour
+public class Level : GameBehaviour
 {
     public Image Star1;
 
@@ -38,7 +38,7 @@ public class Level : MonoBehaviour
             }
             GetComponent<Button>().onClick.AddListener(() =>
             {
-                transform.root.GetComponent<SceneLoader>().Load(sceneName);
+                GotoScene(sceneName);
             });
         }
         else

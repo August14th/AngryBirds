@@ -55,7 +55,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\SceneLoader.cs" />
     <Compile Include="Assets\Scripts\Bird.cs" />
     <Compile Include="Assets\Scripts\BlackBird.cs" />
     <Compile Include="Assets\Scripts\Boom.cs" />
@@ -64,6 +63,7 @@
     <Compile Include="Assets\Scripts\CameraMove.cs" />
     <Compile Include="Assets\Scripts\Destroyer.cs" />
     <Compile Include="Assets\Scripts\Enemy.cs" />
+    <Compile Include="Assets\Scripts\GameBehaviour.cs" />
     <Compile Include="Assets\Scripts\GameManger.cs" />
     <Compile Include="Assets\Scripts\GreenBird.cs" />
     <Compile Include="Assets\Scripts\Level.cs" />
