@@ -29,21 +29,13 @@ public class Package
 		var bundles = manifest.GetAllAssetBundles().ToList();
 		bundles.Add("Bundles");
 		var lines = new List<string>();
-		using (var md5 = MD5.Create())
+		foreach (var bundle in bundles)
 		{
-			foreach (var bundle in bundles)
-			{
-				var file = new FileInfo(output.FullName + "/" + bundle);
-				string md5String;
-				using (var stream = file.Open(FileMode.Open))
-				{
-					var md5Bytes = md5.ComputeHash(stream);
-					md5String = BitConverter.ToString(md5Bytes).Replace("-", string.Empty).ToLower();
-					lines.Add(bundle + "." + md5String);
-				}
+			var file = new FileInfo(output.FullName + "/" + bundle);
+			var crc32 = CRC32.GetCRC32(File.ReadAllBytes(file.FullName)).ToString("X").ToLower();
+			lines.Add(bundle + "." + crc32);
 
-				file.MoveTo(file.FullName + "." + md5String);
-			}
+			file.MoveTo(file.FullName + "." + crc32);
 		}
 
 		var bundlesFile = new FileInfo("bundles.txt");

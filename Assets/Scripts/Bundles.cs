@@ -10,7 +10,7 @@ using UnityEngine.Networking;
 public class Bundles : MonoBehaviour
 {
     private static readonly string HomeURI = "http://localhost:7070/D%3A/Projects/AngryBirds/";
-    
+
     private static readonly string BundleURI = HomeURI + "Bundles/";
 
     private readonly Dictionary<object, HashSet<object>> _ins = new Dictionary<object, HashSet<object>>();
@@ -18,14 +18,14 @@ public class Bundles : MonoBehaviour
     private readonly Dictionary<object, HashSet<AssetBundle>> _outs = new Dictionary<object, HashSet<AssetBundle>>();
 
     private readonly Dictionary<string, AssetBundle> _bundles = new Dictionary<string, AssetBundle>();
-    
+
     private readonly Dictionary<string, string> _bundleFiles = new Dictionary<string, string>();
-    
+
     private static string LocalPath
     {
         get { return Application.persistentDataPath + "/Bundles/"; }
     }
-    
+
     private void Start()
     {
         StartCoroutine(DownloadBundles());
@@ -82,6 +82,7 @@ public class Bundles : MonoBehaviour
         {
             LoadBundle(bundleName);
         }
+
         return _bundles[bundleName];
     }
 
@@ -89,8 +90,8 @@ public class Bundles : MonoBehaviour
     {
         string fileName;
         _bundleFiles.TryGetValue(bundleName, out fileName);
-        if(fileName == null) throw new Exception(bundleName + " not found!");
-        
+        if (fileName == null) throw new Exception(bundleName + " not found!");
+
         var bundle = AssetBundle.LoadFromFile(Path.Combine(LocalPath, fileName));
         Debug.Log("Load asset bundle:" + bundleName);
         _bundles[bundleName] = bundle;
@@ -125,10 +126,11 @@ public class Bundles : MonoBehaviour
         {
             Debug.LogError("Download bundles.txt failed:" + request.error);
         }
+
         var text = request.downloadHandler.text;
 
         request.Dispose();
-        
+
         var remotes = text.Split('\n').ToList();
         var localFolder = new DirectoryInfo(LocalPath);
         var locals = localFolder.GetFiles("*", SearchOption.AllDirectories).ToList();
@@ -140,39 +142,40 @@ public class Bundles : MonoBehaviour
             {
                 locals.RemoveAt(i);
                 remotes.Remove(file);
-                string bundle, md5String;
-                Parse(file, out bundle, out md5String);
+                string bundle, crc32;
+                Parse(file, out bundle, out crc32);
                 _bundleFiles[bundle] = file;
             }
         }
+
         locals.ForEach(d => d.Delete());
 
         foreach (var remote in remotes)
         {
             yield return DownloadBundle(remote);
         }
-        
+
         Debug.Log("All Bundles are downloaded.");
     }
 
-    private void Parse(string file, out string bundle, out string md5)
+    private void Parse(string file, out string bundle, out string crc32)
     {
         var sep = file.LastIndexOf('.');
         bundle = file.Substring(0, sep);
-        md5 = file.Substring(sep + 1);
+        crc32 = file.Substring(sep + 1);
     }
 
 
     private IEnumerator DownloadBundle(string file)
     {
-        string bundle, md5String;
-        Parse(file, out bundle, out md5String);
-        
+        string bundle, crc32String;
+        Parse(file, out bundle, out crc32String);
+
         var localFile = new FileInfo(LocalPath + file);
         if (localFile.Exists) localFile.Delete();
         var folder = localFile.Directory;
         if (folder != null && !folder.Exists) folder.Create();
-        
+
         var request = UnityWebRequest.Get(BundleURI + file);
         var tmpFile = new FileInfo(localFile.FullName + ".tmp");
         request.downloadHandler = new DownloadHandlerFile(tmpFile.FullName);
@@ -185,24 +188,14 @@ public class Bundles : MonoBehaviour
         }
         else
         {
-            var valid = false;
-            using (var md5 = MD5.Create())
-            {
-                using (var stream = File.OpenRead(tmpFile.FullName))
-                {
-                    var hash = md5.ComputeHash(stream);
-                    var hexString = BitConverter.ToString(hash).Replace("-", "").ToLower();
-                    if (hexString == md5String) valid = true;
-                }
-            }
-
-            if (!valid) tmpFile.Delete();
-            else
+            var crc32 = CRC32.GetCRC32(File.ReadAllBytes(tmpFile.FullName)).ToString("X").ToLower();
+            if (crc32 == crc32String)
             {
                 tmpFile.MoveTo(localFile.FullName);
                 _bundleFiles[bundle] = file;
                 Debug.Log("Download Bundle:" + bundle + " ok");
             }
+            else tmpFile.Delete();
 
         }
 

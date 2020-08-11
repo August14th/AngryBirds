@@ -1,6 +1,6 @@
 using System;
 
-class CRC32
+public class CRC32
     {
         static UInt32[] crcTable =
         {
