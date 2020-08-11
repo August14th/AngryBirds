@@ -59,9 +59,12 @@
     <Compile Include="Assets\Scripts\BlackBird.cs" />
     <Compile Include="Assets\Scripts\Boom.cs" />
     <Compile Include="Assets\Scripts\Brick.cs" />
+    <Compile Include="Assets\Scripts\Bundles.cs" />
     <Compile Include="Assets\Scripts\CameraFollow.cs" />
     <Compile Include="Assets\Scripts\CameraMove.cs" />
+    <Compile Include="Assets\Scripts\CRC32.cs" />
     <Compile Include="Assets\Scripts\Destroyer.cs" />
+    <Compile Include="Assets\Scripts\DontDestory.cs" />
     <Compile Include="Assets\Scripts\Enemy.cs" />
     <Compile Include="Assets\Scripts\GameBehaviour.cs" />
     <Compile Include="Assets\Scripts\GameManger.cs" />
@@ -76,9 +79,9 @@
     <Compile Include="Assets\Scripts\Pig.cs" />
     <Compile Include="Assets\Scripts\SlingShot.cs" />
     <Compile Include="Assets\Scripts\State.cs" />
+    <Compile Include="Assets\Scripts\Test.cs" />
     <Compile Include="Assets\Scripts\WinPanel.cs" />
     <Compile Include="Assets\Scripts\YellowBird.cs" />
-    <None Include="Assets\codeandweb.com\Readme.txt" />
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>D:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.CoreModule.dll</HintPath>
     </Reference>

@@ -81,7 +81,6 @@
     <Compile Include="Assets\Plugins\GoKit\extensions\GoKitTweenExtensions.cs" />
     <Compile Include="Assets\Plugins\GoKit\Go.cs" />
     <Compile Include="Assets\Plugins\GoKit\GoDummyPath.cs" />
-    <Compile Include="Assets\Plugins\GoKit\GoPathSettings.cs" />
     <Compile Include="Assets\Plugins\GoKit\GoProxyProp.cs" />
     <Compile Include="Assets\Plugins\GoKit\GoTween.cs" />
     <Compile Include="Assets\Plugins\GoKit\GoTweenChain.cs" />

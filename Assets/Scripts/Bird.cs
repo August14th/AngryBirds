@@ -28,7 +28,7 @@ public class Bird : GameBehaviour
 
     private void OnMouseDrag()
     {
-        if (IsOnGUI()) return;
+        if (IsBehindGUI()) return;
         if (_state != 1) return;
         Vector2 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         GameManger.DragBird(this, pos);
@@ -36,7 +36,7 @@ public class Bird : GameBehaviour
 
     private void OnMouseUp()
     {
-        if (IsOnGUI()) return;
+        if (IsBehindGUI()) return;
         if (_state != 1) return;
         _trailRenderer.enabled = true;
         GameManger.ThrowBird(this);
