@@ -44,10 +44,14 @@ public class Bundles : MonoBehaviour
         _outs[go].Add(bundle);
     }
 
+    public void RemoveBundle(string bundleName)
+    {
+        AssetBundle bundle;
+        if(_bundles.TryGetValue(bundleName, out bundle)) RemoveRef(bundle);
+    }
+
     public void RemoveRef(object go)
     {
-        HashSet<object> ins;
-        _ins.TryGetValue(go, out ins);
         if (_ins.Remove(go))
         {
             var bundle = go as AssetBundle;
@@ -64,10 +68,9 @@ public class Bundles : MonoBehaviour
         }
 
         HashSet<AssetBundle> outs;
-        _outs.TryGetValue(go, out outs);
-        _outs.Remove(go);
-        if (outs != null)
+        if (_outs.TryGetValue(go, out outs))
         {
+            _outs.Remove(go);
             foreach (var @out in outs)
             {
                 _ins[@out].Remove(go);
@@ -89,8 +92,8 @@ public class Bundles : MonoBehaviour
     private AssetBundle LoadBundle(string bundleName)
     {
         string fileName;
-        _bundleFiles.TryGetValue(bundleName, out fileName);
-        if (fileName == null) throw new Exception(bundleName + " not found!");
+        if(!_bundleFiles.TryGetValue(bundleName, out fileName))
+            throw new Exception("bundle file of " + bundleName + " not found!");
 
         var bundle = AssetBundle.LoadFromFile(Path.Combine(LocalPath, fileName));
         Debug.Log("Load asset bundle:" + bundleName);
@@ -101,7 +104,7 @@ public class Bundles : MonoBehaviour
         var dependencies = GetDependencies(bundleName);
         foreach (var dependency in dependencies)
         {
-            var dependent = LoadBundle(dependency);
+            var dependent = Get(dependency);
             _ins[dependent].Add(bundle);
             _outs[bundle].Add(dependent);
         }

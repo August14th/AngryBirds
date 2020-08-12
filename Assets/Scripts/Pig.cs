@@ -12,9 +12,9 @@ public class Pig : Enemy
 
     private SpriteRenderer _renderer;
 
-    public GameObject Boom;
+    private string Boom = "Prefab/Boom";
 
-    public GameObject PigScore;
+    private string PigScore = "Prefab/Score3000";
 
     private void Start()
     {
@@ -40,8 +40,8 @@ public class Pig : Enemy
     public override void Dead()
     {
         Destroy(gameObject);
-        Instantiate(Boom, transform.position, Quaternion.identity);
-        GameObject go = Instantiate(PigScore, transform.position + new Vector3(0, 0.5f, 0), Quaternion.identity);
+        NewActor(Boom, transform.position);
+        GameObject go = NewActor(PigScore, transform.position + new Vector3(0, 0.5f, 0));
         Destroy(go, 1f);
     }
 }

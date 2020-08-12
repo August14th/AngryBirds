@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class WinPanel : MonoBehaviour
+public class WinPanel : GameBehaviour
 {
 
 	public Button RetryBtn;
@@ -23,8 +23,8 @@ public class WinPanel : MonoBehaviour
 	// Use this for initialization
 	void Start()
 	{
-		RetryBtn.onClick.AddListener(() => SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex));
-		MainBtn.onClick.AddListener(() => SceneManager.LoadScene("Main"));
+		RetryBtn.onClick.AddListener(() => GotoScene(SceneManager.GetActiveScene().name));
+		MainBtn.onClick.AddListener(() => GotoScene("Main"));
 	}
 
 

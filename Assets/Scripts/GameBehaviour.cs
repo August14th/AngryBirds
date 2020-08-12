@@ -14,19 +14,24 @@ public class GameBehaviour : ShortCut
 
     private IEnumerator LoadScene(string sceneName)
     {
-        var loading = New("Loading", Canvas.transform);
-        
-        var bundleName = sceneName.ToLower() + ".ab";
-        var bundle = Bundles.Get(bundleName);
-        bundle.LoadAsset<GameObject>(sceneName);
-        
+        var currentBundleName = SceneBundleName(SceneManager.GetActiveScene().name);
+        Bundles.RemoveBundle(currentBundleName);
+
+        var bundleName = SceneBundleName(sceneName);
+        Bundles.Get(bundleName);
         var asyncOpt = SceneManager.LoadSceneAsync(sceneName);
+        var loading = NewUI("Loading", Canvas.transform);
+        var progress = loading.GetComponentInChildren<Text>();
         while (!asyncOpt.isDone)
         {
-            var progress = loading.GetComponentInChildren<Text>();
             progress.text = asyncOpt.progress * 100 + "%";
             yield return null;
         }
+    }
+
+    private string SceneBundleName(string sceneName)
+    {
+        return "scenes/" + sceneName.ToLower() + ".ab";
     }
 
     protected bool IsBehindGUI()
@@ -34,36 +39,73 @@ public class GameBehaviour : ShortCut
         return EventSystem.current.IsPointerOverGameObject();
     }
 
-    protected GameObject New(string prefabName, Transform parent)
+    protected T NewActor<T>(string prefabName, Vector3 position)
     {
-        var go = CreateFromBundle(prefabName, parent);
-        if (go == null) go = CreateFromResources(prefabName, parent);
-        if (!go.GetComponent<ClearOnDestroy>()) go.AddComponent<ClearOnDestroy>();
-
-        return go;
+        var actor = NewActor(prefabName, position);
+        return actor.GetComponent<T>();
     }
 
-    protected T New<T>(string prefabName, Transform parent)
+    protected GameObject NewActor(string prefabName, Vector3 position)
     {
-        var go = New(prefabName, parent);
-        return go.GetComponent<T>();
+        AssetBundle bundle;
+        var prefab = LoadFromBundle(prefabName, out bundle);
+        if (prefab != null)
+        {
+            var actor = Instantiate(prefab, position, Quaternion.identity);
+            if (!actor.GetComponent<ClearOnDestroy>()) 
+                actor.AddComponent<ClearOnDestroy>();
+            Bundles.AddRef(bundle, actor);
+            return actor;
+        }
+
+        prefab = LoadFromResources(prefabName);
+        if (prefab != null)
+        {
+            return Instantiate(prefab, position, Quaternion.identity);
+        }
+
+        return null;
     }
 
-    private GameObject CreateFromBundle(string prefabName, Transform parent)
+    protected T NewUI<T>(string prefabName, Transform parent)
+    {
+        var ui = NewUI(prefabName, parent);
+        return ui.GetComponent<T>();
+    }
+    
+    protected GameObject NewUI(string prefabName, Transform parent)
+    {
+        AssetBundle bundle;
+        var prefab = LoadFromBundle(prefabName, out bundle);
+        if (prefab != null)
+        {
+            var ui = Instantiate(prefab, parent.transform, false);
+            ui.AddComponent<ClearOnDestroy>();
+            Bundles.AddRef(bundle, ui);
+            return ui;
+        }
+
+        prefab = LoadFromResources(prefabName);
+        if (prefab != null)
+        {
+            return Instantiate(prefab, parent.transform, false);
+        }
+
+        return null;
+    }
+
+    private GameObject LoadFromBundle(string prefabName, out AssetBundle bundle)
     {
         var bundleName = prefabName.ToLower() + ".ab";
-        var bundle = Bundles.Get(bundleName);
+        bundle = Bundles.Get(bundleName);
         if (bundle == null) return null;
         var prefab = bundle.LoadAsset<GameObject>(prefabName);
-        var go = Instantiate(prefab, parent.transform, false);
-        Bundles.AddRef(bundle, go);
-        return go;
+        return prefab;
     }
 
-    private GameObject CreateFromResources(string prefabName, Transform parent)
+    private GameObject LoadFromResources(string prefabName)
     {
         var prefab = Resources.Load<GameObject>(prefabName);
-        var go = Instantiate(prefab, parent.transform, false);
-        return go;
+        return prefab;
     }
 }

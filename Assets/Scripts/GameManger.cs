@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class GameManger : MonoBehaviour
+public class GameManger : GameBehaviour
 {
     public List<Bird> Birds;
 
@@ -12,11 +12,9 @@ public class GameManger : MonoBehaviour
 
     public SlingShot SlingShot;
 
-    public GameObject LosePanel;
+    private string LosePanel = "Prefab/LosePanel";
 
-    public GameObject WinPanel;
-
-    public GameObject Canvas;
+    private string WinPanel = "Prefab/WinPanel";
 
     private State _state;
 
@@ -106,8 +104,8 @@ public class GameManger : MonoBehaviour
         if (isWin)
         {
             var stars = Birds.Count(b => b) + 1;
-            var winPanel = Instantiate(WinPanel, Canvas.transform, false);
-            winPanel.GetComponent<WinPanel>().SetStars(stars);
+            var winPanel = NewUI<WinPanel>(WinPanel, Canvas.transform);
+            winPanel.SetStars(stars);
             var lastStars = PlayerPrefs.GetInt(Level);
             if (lastStars < stars)
             {
@@ -118,7 +116,7 @@ public class GameManger : MonoBehaviour
         }
         else
         {
-            Instantiate(LosePanel, Canvas.transform, false);
+            NewUI(LosePanel, Canvas.transform);
         }
     }
 

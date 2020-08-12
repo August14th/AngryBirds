@@ -19,13 +19,18 @@ public class Package
 
 	private static uint Version = 1;
 
-	[MenuItem("Package/Build/Android")]
-	static void BuildAndroid()
+	[MenuItem("Package/Build/Windows")]
+	static void BuildWindows()
+	{
+		Build(BuildTarget.StandaloneWindows64);
+	}
+
+	private static void Build(BuildTarget target)
 	{
 		var output = new DirectoryInfo(OupPutFolder);
 		if (output.Exists) output.Delete(true);
 		output.Create();
-		var manifest = BuildPipeline.BuildAssetBundles(OupPutFolder, BuildAssetBundleOptions.None, BuildTarget.Android);
+		var manifest = BuildPipeline.BuildAssetBundles(OupPutFolder, BuildAssetBundleOptions.None, target);
 		var bundles = manifest.GetAllAssetBundles().ToList();
 		bundles.Add("Bundles");
 		var lines = new List<string>();
@@ -41,7 +46,7 @@ public class Package
 		var bundlesFile = new FileInfo("bundles.txt");
 		File.WriteAllText(bundlesFile.FullName, string.Join("\n", lines.ToArray()));
 
-		Debug.Log("BuildAndroid completed.");
+		Debug.Log("Build " + target + " completed.");
 	}
 
 	private static void MarkAssetBundleLabels(string folder)

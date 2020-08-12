@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class LevelPanel : MonoBehaviour
+public class LevelPanel : GameBehaviour
 {
-	public GameObject LevelPrefab;
+	private string LevelPrefab = "Prefab/Level";
 
 	public GameObject Grid;
 
@@ -31,9 +31,8 @@ public class LevelPanel : MonoBehaviour
 		for (var i = 1; i <= levels; i++)
 		{
 			var levelName = map + "-" + i;
-			var levelGo = Instantiate(LevelPrefab, Grid.transform, false);
-			levelGo.name = levelName;
-			var level = levelGo.GetComponent<Level>();
+			var level = NewUI<Level>(LevelPrefab, Grid.transform);
+			level.name = levelName;
 			if (!closed)
 			{
 				var stars = PlayerPrefs.GetInt(levelName, 0);

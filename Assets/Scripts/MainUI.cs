@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class MainUI : MonoBehaviour
+public class MainUI : GameBehaviour
 {
 
     public Button PauseBtn;
 
-    public GameObject PausePanel;
+    private string PausePanel = "Prefab/PausePanel";
 
 
     private void Start()
@@ -20,7 +20,7 @@ public class MainUI : MonoBehaviour
     private void ShowPausePanel()
     {
         PauseBtn.gameObject.SetActive(false);
-        Instantiate(PausePanel, transform, false);
+        NewUI(PausePanel, transform);
     }
 
     public void ShowPauseBtn()

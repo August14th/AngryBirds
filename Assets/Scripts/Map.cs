@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Map : MonoBehaviour
+public class Map : GameBehaviour
 {
 	public int Index;
 
@@ -13,7 +13,9 @@ public class Map : MonoBehaviour
 
 	public Text StarNeedText;
 
-	public void SetStatus(int stars, GameObject levelPanel, GameObject parent)
+	private string LevelPanel = "Prefab/LevelPanel";
+
+	public void SetStatus(int stars, GameObject parent)
 	{
 		if (stars < StarNeed)
 		{
@@ -28,8 +30,8 @@ public class Map : MonoBehaviour
 			button.onClick.AddListener(() =>
 			{
 				parent.SetActive(false);
-				var go = Instantiate(levelPanel, transform.root, false);
-				go.GetComponent<LevelPanel>().ShowLevels(parent, Index, 12);
+				var go = NewUI<LevelPanel>(LevelPanel, transform.root);
+				go.ShowLevels(parent, Index, 12);
 			});
 		}
 	}
