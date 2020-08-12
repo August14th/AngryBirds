@@ -23,7 +23,7 @@ public class Bundles : MonoBehaviour
 
     private static string LocalPath
     {
-        get { return Application.persistentDataPath + "/Bundles/"; }
+        get { return Path.Combine(Application.persistentDataPath, "Bundles"); }
     }
 
     private void Start()
@@ -131,13 +131,14 @@ public class Bundles : MonoBehaviour
 
         request.Dispose();
 
-        var remotes = text.Split('\n').ToList();
+        var remotes = new HashSet<string>(text.Split('\n').ToList());
         var localFolder = new DirectoryInfo(LocalPath);
         var locals = localFolder.GetFiles("*", SearchOption.AllDirectories).ToList();
 
         for (int i = locals.Count - 1; i >= 0; i--)
         {
-            var file = locals[i].FullName.Substring(LocalPath.Length).Replace(@"\", "/");
+            var relativePath = locals[i].FullName.Substring(LocalPath.Length + 1);
+            var file = relativePath.Replace(Path.DirectorySeparatorChar.ToString(), "/");
             if (remotes.Contains(file))
             {
                 locals.RemoveAt(i);
@@ -171,7 +172,7 @@ public class Bundles : MonoBehaviour
         string bundle, crc32String;
         Parse(file, out bundle, out crc32String);
 
-        var localFile = new FileInfo(LocalPath + file);
+        var localFile = new FileInfo(Path.Combine(LocalPath, file));
         if (localFile.Exists) localFile.Delete();
         var folder = localFile.Directory;
         if (folder != null && !folder.Exists) folder.Create();

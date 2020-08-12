@@ -4,17 +4,8 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class GameBehaviour : MonoBehaviour
+public class GameBehaviour : ShortCut
 {
-
-    private Bundles _bundles;
-
-    private Bundles GetBundles()
-    {
-        if (_bundles == null)
-            _bundles = FindObjectOfType<Bundles>();
-        return _bundles;
-    }
 
     public void GotoScene(string sceneName)
     {
@@ -23,8 +14,12 @@ public class GameBehaviour : MonoBehaviour
 
     private IEnumerator LoadScene(string sceneName)
     {
-        GameObject prefab = Resources.Load<GameObject>("Loading");
-        var loading = Instantiate(prefab, gameObject.transform.root, false);
+        var loading = New("Loading", Canvas.transform);
+        
+        var bundleName = sceneName.ToLower() + ".ab";
+        var bundle = Bundles.Get(bundleName);
+        bundle.LoadAsset<GameObject>(sceneName);
+        
         var asyncOpt = SceneManager.LoadSceneAsync(sceneName);
         while (!asyncOpt.isDone)
         {
@@ -39,33 +34,36 @@ public class GameBehaviour : MonoBehaviour
         return EventSystem.current.IsPointerOverGameObject();
     }
 
-    protected T NewGameObject<T>(string prefabName, GameObject parent) where T : GameBehaviour
+    protected GameObject New(string prefabName, Transform parent)
     {
-        var t = CreateFromBundle<T>(prefabName, parent);
-        return t != null ? t : CreateFromResources<T>(prefabName, parent);
+        var go = CreateFromBundle(prefabName, parent);
+        if (go == null) go = CreateFromResources(prefabName, parent);
+        if (!go.GetComponent<ClearOnDestroy>()) go.AddComponent<ClearOnDestroy>();
+
+        return go;
     }
 
-    private T CreateFromBundle<T>(string prefabName, GameObject parent) where T : GameBehaviour
+    protected T New<T>(string prefabName, Transform parent)
     {
-        var ab = prefabName.ToLower() + ".ab";
-        var bundle = GetBundles().Get(ab);
+        var go = New(prefabName, parent);
+        return go.GetComponent<T>();
+    }
+
+    private GameObject CreateFromBundle(string prefabName, Transform parent)
+    {
+        var bundleName = prefabName.ToLower() + ".ab";
+        var bundle = Bundles.Get(bundleName);
         if (bundle == null) return null;
         var prefab = bundle.LoadAsset<GameObject>(prefabName);
         var go = Instantiate(prefab, parent.transform, false);
-        GetBundles().AddRef(bundle, go);
-        return go.GetComponent<T>();
+        Bundles.AddRef(bundle, go);
+        return go;
     }
 
-    private T CreateFromResources<T>(string prefabName, GameObject parent) where T : GameBehaviour
+    private GameObject CreateFromResources(string prefabName, Transform parent)
     {
-        var prefab = Resources.Load<T>(prefabName);
+        var prefab = Resources.Load<GameObject>(prefabName);
         var go = Instantiate(prefab, parent.transform, false);
-        return go.GetComponent<T>();
-    }
-
-
-    private void OnDestroy()
-    {
-        if (_bundles) _bundles.RemoveRef(gameObject);
+        return go;
     }
 }
