@@ -302,7 +302,6 @@ MonoBehaviour:
   - {fileID: 1834780677}
   - {fileID: 35488327}
   - {fileID: 97623383}
-  LevelPanel: {fileID: 1258214927711148, guid: eb14bd29eac5df54c8cd9cc31264c4b8, type: 2}
 --- !u!1 &241780578
 GameObject:
   m_ObjectHideFlags: 0
@@ -563,7 +562,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 510866844}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ed346586a27e49d3a6db6a54e7fa30a5, type: 3}
+  m_Script: {fileID: 11500000, guid: cf8ae69498f54134a8f8e16b5b6319bc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &510866846

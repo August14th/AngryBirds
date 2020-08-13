@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 
 public class Bundles : MonoBehaviour
 {
@@ -31,7 +31,7 @@ public class Bundles : MonoBehaviour
         StartCoroutine(DownloadBundles());
     }
 
-    public void AddRef(AssetBundle bundle, GameObject go)
+    private void AddRef(AssetBundle bundle, GameObject go)
     {
         if (bundle == null) return;
         _ins[bundle].Add(go);
@@ -44,7 +44,7 @@ public class Bundles : MonoBehaviour
         _outs[go].Add(bundle);
     }
 
-    public void RemoveBundle(string bundleName)
+    private void RemoveBundle(string bundleName)
     {
         AssetBundle bundle;
         if(_bundles.TryGetValue(bundleName, out bundle)) RemoveRef(bundle);
@@ -79,7 +79,7 @@ public class Bundles : MonoBehaviour
         }
     }
 
-    public AssetBundle Get(string bundleName)
+    private AssetBundle Get(string bundleName)
     {
         if (!_bundles.ContainsKey(bundleName))
         {
@@ -89,7 +89,7 @@ public class Bundles : MonoBehaviour
         return _bundles[bundleName];
     }
 
-    private AssetBundle LoadBundle(string bundleName)
+    private void LoadBundle(string bundleName)
     {
         string fileName;
         if(!_bundleFiles.TryGetValue(bundleName, out fileName))
@@ -108,8 +108,6 @@ public class Bundles : MonoBehaviour
             _ins[dependent].Add(bundle);
             _outs[bundle].Add(dependent);
         }
-
-        return bundle;
     }
 
     private string[] GetDependencies(string bundle)
@@ -205,5 +203,82 @@ public class Bundles : MonoBehaviour
 
         request.Dispose();
     }
+    
+    public GameObject NewActor(string prefabName, Vector3 position)
+    {
+        AssetBundle bundle;
+        var prefab = LoadPrefab(prefabName, out bundle);
+        if (prefab != null)
+        {
+            var actor = Instantiate(prefab, position, Quaternion.identity);
 
+            var t = actor.AddComponent<DestroyCallback>();
+            t.Callback = () => RemoveRef(t.gameObject);
+
+            AddRef(bundle, actor);
+            return actor;
+        }
+
+        prefab = LoadFromResources(prefabName);
+        if (prefab != null)
+        {
+            return Instantiate(prefab, position, Quaternion.identity);
+        }
+
+        return null;
+    }
+
+    
+    public GameObject NewUI(string prefabName, Transform parent)
+    {
+        AssetBundle bundle;
+        var prefab = LoadPrefab(prefabName, out bundle);
+        if (prefab != null)
+        {
+            var ui = Instantiate(prefab, parent.transform, false);
+            
+            var t = ui.AddComponent<DestroyCallback>();
+            t.Callback = () => RemoveRef(t.gameObject);
+            
+            AddRef(bundle, ui);
+            return ui;
+        }
+
+        prefab = LoadFromResources(prefabName);
+        if (prefab != null)
+        {
+            return Instantiate(prefab, parent.transform, false);
+        }
+
+        return null;
+    }
+
+    public void LoadScene(string sceneName)
+    {
+        var currentBundleName = SceneBundleName(SceneManager.GetActiveScene().name);
+        RemoveBundle(currentBundleName);
+
+        var bundleName = SceneBundleName(sceneName);
+        Get(bundleName);
+    }
+    
+    private string SceneBundleName(string sceneName)
+    {
+        return "scenes/" + sceneName.ToLower() + ".ab";
+    }
+
+    private GameObject LoadPrefab(string prefabName, out AssetBundle bundle)
+    {
+        var bundleName = prefabName.ToLower() + ".ab";
+        bundle = Get(bundleName);
+        if (bundle == null) return null;
+        var prefab = bundle.LoadAsset<GameObject>(prefabName);
+        return prefab;
+    }
+    
+    private GameObject LoadFromResources(string prefabName)
+    {
+        var prefab = Resources.Load<GameObject>(prefabName);
+        return prefab;
+    }
 }

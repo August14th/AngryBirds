@@ -104,7 +104,7 @@ public class GameManger : GameBehaviour
         if (isWin)
         {
             var stars = Birds.Count(b => b) + 1;
-            var winPanel = NewUI<WinPanel>(WinPanel, Canvas.transform);
+            var winPanel = Assets.NewUI<WinPanel>(WinPanel, Canvas.transform);
             winPanel.SetStars(stars);
             var lastStars = PlayerPrefs.GetInt(Level);
             if (lastStars < stars)
@@ -116,7 +116,7 @@ public class GameManger : GameBehaviour
         }
         else
         {
-            NewUI(LosePanel, Canvas.transform);
+            Assets.NewUI(LosePanel, Canvas.transform);
         }
     }
 

@@ -23,7 +23,7 @@ public class LevelPanel : GameBehaviour
 		});
 	}
 
-	public void ShowLevels(GameObject parent, int map, int levels)
+	public void Init(GameObject parent, int map, int levels)
 	{
 		_parent = parent;
 		var closed = false;
@@ -31,7 +31,7 @@ public class LevelPanel : GameBehaviour
 		for (var i = 1; i <= levels; i++)
 		{
 			var levelName = map + "-" + i;
-			var level = NewUI<Level>(LevelPrefab, Grid.transform);
+			var level = Assets.NewUI<Level>(LevelPrefab, Grid.transform);
 			level.name = levelName;
 			if (!closed)
 			{

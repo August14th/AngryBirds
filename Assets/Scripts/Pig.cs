@@ -40,8 +40,8 @@ public class Pig : Enemy
     public override void Dead()
     {
         Destroy(gameObject);
-        NewActor(Boom, transform.position);
-        GameObject go = NewActor(PigScore, transform.position + new Vector3(0, 0.5f, 0));
+        Assets.NewActor(Boom, transform.position);
+        GameObject go = Assets.NewActor(PigScore, transform.position + new Vector3(0, 0.5f, 0));
         Destroy(go, 1f);
     }
 }

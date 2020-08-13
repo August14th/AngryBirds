@@ -15,7 +15,7 @@ public class Map : GameBehaviour
 
 	private string LevelPanel = "Prefab/LevelPanel";
 
-	public void SetStatus(int stars, GameObject parent)
+	public void Init(int stars, GameObject parent)
 	{
 		if (stars < StarNeed)
 		{
@@ -30,8 +30,8 @@ public class Map : GameBehaviour
 			button.onClick.AddListener(() =>
 			{
 				parent.SetActive(false);
-				var go = NewUI<LevelPanel>(LevelPanel, transform.root);
-				go.ShowLevels(parent, Index, 12);
+				var go = Assets.NewUI<LevelPanel>(LevelPanel, transform.root);
+				go.Init(parent, Index, 12);
 			});
 		}
 	}

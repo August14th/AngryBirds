@@ -12,7 +12,7 @@ public class MapPanel : MonoBehaviour
 		var stars = PlayerPrefs.GetInt("Stars");
 		Maps.ForEach(map =>
 		{
-			map.SetStatus(stars, gameObject);
+			map.Init(stars, gameObject);
 		});
 		
 	}

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
 using UnityEditor;
 using UnityEngine;
 
@@ -10,7 +9,7 @@ public class Package
 {
 
 	private static readonly string OupPutFolder = "Bundles";
-	
+
 	[MenuItem("Package/Mark")]
 	static void Mark()
 	{
@@ -64,9 +63,11 @@ public class Package
 				var relativePath = assetPath.Substring("Assets/Resources/".Length);
 				string assetBundleName = relativePath.Substring(0, relativePath.LastIndexOf("."));
 				var importer = AssetImporter.GetAtPath(assetPath);
-				importer.SetAssetBundleNameAndVariant(assetBundleName, "ab");
+				if (importer.assetBundleName != assetBundleName) importer.assetBundleName = assetBundleName;
+				if (importer.assetBundleVariant != "ab") importer.assetBundleVariant = "ab";
 			}
 		}
+
 		AssetDatabase.RemoveUnusedAssetBundleNames();
 		Debug.Log(folder + ": Mark AssetBundle Labels ok.");
 	}

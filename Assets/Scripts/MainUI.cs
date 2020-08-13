@@ -20,7 +20,7 @@ public class MainUI : GameBehaviour
     private void ShowPausePanel()
     {
         PauseBtn.gameObject.SetActive(false);
-        NewUI(PausePanel, transform);
+        Assets.NewUI(PausePanel, transform);
     }
 
     public void ShowPauseBtn()

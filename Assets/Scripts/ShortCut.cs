@@ -12,9 +12,9 @@ public class ShortCut : MonoBehaviour {
 		return _engine;
 	}
 
-	protected Bundles Bundles
+	protected Assets Assets
 	{
-		get { return GetEngine().GetComponent<Bundles>(); }
+		get { return GetEngine().GetComponent<Assets>(); }
 	}
     
 	protected GameObject Canvas

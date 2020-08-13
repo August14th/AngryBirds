@@ -55,6 +55,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\Assets.cs" />
     <Compile Include="Assets\Scripts\Bird.cs" />
     <Compile Include="Assets\Scripts\BlackBird.cs" />
     <Compile Include="Assets\Scripts\Boom.cs" />
@@ -62,8 +63,8 @@
     <Compile Include="Assets\Scripts\Bundles.cs" />
     <Compile Include="Assets\Scripts\CameraFollow.cs" />
     <Compile Include="Assets\Scripts\CameraMove.cs" />
-    <Compile Include="Assets\Scripts\ClearOnDestroy.cs" />
     <Compile Include="Assets\Scripts\CRC32.cs" />
+    <Compile Include="Assets\Scripts\DestroyCallback.cs" />
     <Compile Include="Assets\Scripts\Destroyer.cs" />
     <Compile Include="Assets\Scripts\DontDestory.cs" />
     <Compile Include="Assets\Scripts\Enemy.cs" />
