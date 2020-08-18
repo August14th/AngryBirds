@@ -15,7 +15,7 @@ namespace CSObjectWrapEditor
 		};
 
 		[GenPath]
-		public static string GenPath = Application.dataPath + "/Scripts/Gen/";
+		public static string GenPath = Application.dataPath + "/Scripts/GenCode/";
 	}
 	
 	

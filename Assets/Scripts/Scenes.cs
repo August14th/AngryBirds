@@ -1,13 +1,15 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
 using UnityEngine.SceneManagement;
+using Random = UnityEngine.Random;
 
 public class Scenes : ShortCut
 {
-
+	private float minTime = 3;
+	
 	public void GotoScene(string sceneName)
 	{
 		StartCoroutine(LoadScene(sceneName));
@@ -17,12 +19,21 @@ public class Scenes : ShortCut
 	{
 		Assets.LoadScene(sceneName);
 		var asyncOpt = SceneManager.LoadSceneAsync(sceneName);
+		asyncOpt.allowSceneActivation = false;
 		var loading = Assets.NewUI("Loading", Canvas.transform);
-		var progress = loading.GetComponentInChildren<Text>();
-		while (!asyncOpt.isDone)
+		var progressBar = loading.GetComponentInChildren<Text>();
+		float duration = 0; 
+		while (duration < minTime)
 		{
-			progress.text = asyncOpt.progress * 100 + "%";
-			yield return null;
+			float wait = Random.value;
+			yield return new WaitForSeconds(wait);
+			duration += wait;
+			float progress = Math.Min(duration / minTime, asyncOpt.progress);
+			if (progress >= 0.9f)
+			{
+				asyncOpt.allowSceneActivation = true;
+			}
+			if(progressBar) progressBar.text = Convert.ToInt16(progress * 100) + "%";
 		}
 	}
 }
