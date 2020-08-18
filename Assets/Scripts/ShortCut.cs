@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ShortCut : MonoBehaviour {
+public class ShortCut : MonoBehaviour
+{
 
 	private static GameObject _engine;
 
@@ -16,9 +17,19 @@ public class ShortCut : MonoBehaviour {
 	{
 		get { return GetEngine().GetComponent<Assets>(); }
 	}
-    
+
 	protected GameObject Canvas
 	{
 		get { return GameObject.Find("Canvas"); }
+	}
+
+	protected LuaState LuaState
+	{
+		get { return GetEngine().GetComponent<LuaState>(); }
+	}
+
+	protected Scenes Scenes
+	{
+		get { return GetEngine().GetComponent<Scenes>(); }
 	}
 }

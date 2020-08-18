@@ -547,6 +547,8 @@ GameObject:
   - component: {fileID: 510866847}
   - component: {fileID: 510866846}
   - component: {fileID: 510866845}
+  - component: {fileID: 510866848}
+  - component: {fileID: 510866849}
   m_Layer: 5
   m_Name: GameEngine
   m_TagString: GameEngine
@@ -594,6 +596,28 @@ RectTransform:
   m_AnchoredPosition: {x: 640, y: 380}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &510866848
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 510866844}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58848fc4d9b8c1d4582b52b8d4577723, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &510866849
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 510866844}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db9bc59420f8d8f4781fa56ccefd472b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &966357605 stripped
 MonoBehaviour:
   m_PrefabParentObject: {fileID: 114054265427502540, guid: b1d62c3436cab7646935214929e3830b,

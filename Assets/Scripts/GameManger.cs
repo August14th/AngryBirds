@@ -116,7 +116,7 @@ public class GameManger : GameBehaviour
         }
         else
         {
-            Assets.NewUI(LosePanel, Canvas.transform);
+            LuaState.DoString("local panel = require 'lose_panel'; panel();");
         }
     }
 
