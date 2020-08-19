@@ -2,13 +2,13 @@ local class = function(class, super)
     local mt = {
         __call = function(class, ...)
             local instance = {}
-            if(class.ctor) then
+            if class.ctor then
                 instance = class:ctor(...) 
             end
             return setmetatable(instance, {__indx = class})
         end
     }
-    if(super) then 
+    if super then 
         mt.__index = super 
         class.super = super
     end

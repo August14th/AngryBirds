@@ -3,9 +3,9 @@ local list = setmetatable({}, {__call = function(l, ...)
     return setmetatable(data, {__index = l}) 
 end})
 
-function list.filter(data, f)
+function list:filter(f)
     local found = list()
-    data:foreach(function(value) 
+    self:foreach(function(value) 
         if f(value) then
             found:add(vlaue)
         end
@@ -13,70 +13,70 @@ function list.filter(data, f)
     return found
 end
 
-function list.add(data, ...)
+function list:add(...)
     local args = list(...)
     args:foreach(function(arg)
-        table.insert(data, arg)
+        table.insert(self, arg)
     end)
 end
 
-function list.addAll(data, array)
+function list:addall(array)
     for index, value in ipairs(array) do
-        data:add(value)
+        self:add(value)
     end
 end
 
-function list.remove(data, element)
-    for index, value in ipairs(data) do
+function list:remove(element)
+    for index, value in ipairs(self) do
         if value == element then
-            table.remove(data, index)
+            table.remove(self, index)
         end
     end
 end
 
-function list.foreach(data, f)
-    for index, value in ipairs(data) do
+function list:foreach(f)
+    for index, value in ipairs(self) do
         f(value)
     end
 end
 
-function list.map(data, f)
+function list:map(f)
     local results = list()
-    data:foreach(function(value) 
+    self:foreach(function(value) 
         results:add(f(value))
     end)
     return results
 end
 
-function list.exists(data, f)
-    for index, value in ipairs(data) do
+function list:exists(f)
+    for index, value in ipairs(self) do
         if f(value) then return true end
     end
     return false
 end
 
-function list.contains(data, element)
-    for index, value in ipairs(data) do
+function list:contains(element)
+    for index, value in ipairs(self) do
         if value == element then return true end
     end
     return false
 end
 
-function list.size(data)
-    return #data
+function list:size()
+    return #self
 end
 
-function list.mkstring(data, seperator)
+function list:mkstring(seperator)
     local sb = ''
-    for index, value in ipairs(data) do
+    for index, value in ipairs(self) do
         if(index ~= 1) then sb = sb .. seperator end 
         sb = sb .. value
     end
     return sb
 end
 
-function list.groupby(data, f)
-    local tt = data:map(function(value)
+function list:groupby(f)
+    local tt = self:map(function(value)
         return {first = f(value), last = value}
     end)
     local groups = {}
@@ -88,14 +88,14 @@ function list.groupby(data, f)
     return groups
 end
 
-function list.sortby(data, f)
-    table.sort(data, f)
+function list:sortby(f)
+    table.sort(self, f)
 end
 
-function list.max(data, f)
-    local t = data
+function list:max(f)
+    local t = self
     if f~= nil then
-        t = data:map(function(v) f(v) end)
+        t = self:map(function(v) f(v) end)
     end
     local max = nil
     t:foreach(function(v)
@@ -105,10 +105,10 @@ function list.max(data, f)
     return max
 end
 
-function list.min(data, f)
-    local t = data
+function list:min(f)
+    local t = self
     if f~= nil then
-        t = data:map(function(v) f(v) end)
+        t = self:map(function(v) f(v) end)
     end
     local min = nil
     t:foreach(function(v)

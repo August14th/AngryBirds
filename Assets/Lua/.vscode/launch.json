@@ -5,9 +5,21 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Test",
+            "type": "lua",
+            "request": "launch",
+            "stopOnEntry": false,
+            "program": "${workspaceFolder}/test.lua",
+            "cwd": "${workspaceFolder}",
+            "path": "${workspaceFolder}/?.lua",
+            "cpath": "${workspaceFolder}/?.dll",
+            "arg": [],
+            "consoleCoding": "utf8"
+        },
+        {
+            "name": "Unity",
             "type": "emmylua_new",
             "request": "launch",
-            "name": "Unity",
             "host": "localhost",
             "port": 9966,
             "ext": [
