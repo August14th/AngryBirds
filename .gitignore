@@ -5,3 +5,7 @@ Library/
 Temp/
 obj/
 *.meta
+Assets/Scripts/GenCode/
+Bundles/
+bundles.txt
+*.csproj

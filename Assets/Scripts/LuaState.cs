@@ -8,12 +8,22 @@ using UnityEngine.UI;
 public class LuaState : MonoBehaviour
 {
 
-	private static LuaEnv LuaEnv;
+	private LuaEnv LuaEnv;
+
+	public int DebugPort = 9966;
 
 	// Use this for initialization
 	private void Awake()
 	{
 		var luaEnv = new LuaEnv();
+#if UNITY_EDITOR
+		if (File.Exists(Directory.GetCurrentDirectory() + "/emmy_core.dll"))
+		{
+			luaEnv.DoString("local dbg = require('emmy_core'); " +
+			                "dbg.tcpListen('localhost', " + DebugPort + ")");
+			Debug.Log("lua starts, listen on port:" + DebugPort);
+		}
+#endif
 		luaEnv.AddLoader((ref string filepath) =>
 		{
 			filepath = Application.dataPath + "/Lua/" + filepath.Replace('.', '/') + ".lua";
