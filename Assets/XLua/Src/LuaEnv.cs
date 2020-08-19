@@ -479,6 +479,18 @@ namespace XLua
                     obj = { ['.fqn'] = fqn }
                     setmetatable(obj, metatable)
                 elseif obj == true then
+                    local index = G_index['CS.'..fqn]
+                    if index then
+                        local mt = debug.getregistry()[fqn]
+                        mt.__index = index(mt.__index)
+                        print('extends __index on class', fqn)
+                    end
+                    local newindex = G_newindex['CS.'..fqn]
+                    if newindex then
+                        local mt = debug.getregistry()[fqn]
+                        mt.__newindex = newindex(mt.__newindex)
+                        print('extends __newindex on class', fqn)
+                    end
                     return rawget(self, key)
                 end
 

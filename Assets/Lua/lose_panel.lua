@@ -8,9 +8,9 @@ function _M:ctor()
     local canvas = self:Canvas()
     local scenes = self:Scenes()
     local panel = assets:NewUI(self.prefab_name, canvas.transform)
-    panel:child("Home"):com("Button"):click(function()
+    panel:child("Home").Button.click = function()
         scenes:GotoScene("Main")
-    end)
+    end
     return {panel = panel}
 end
 

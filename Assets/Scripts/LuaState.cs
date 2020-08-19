@@ -34,6 +34,9 @@ public class LuaState : MonoBehaviour
 
 			return null;
 		});
+		luaEnv.DoString("G_index = require 'extends.index'");
+		luaEnv.DoString("G_newindex = require 'extends.newindex'");
+		luaEnv.DoString("require 'extends.extends'");
 		LuaEnv = luaEnv;
 	}
 
