@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using XLua;
 
 namespace CSObjectWrapEditor
@@ -11,7 +12,8 @@ namespace CSObjectWrapEditor
 
 		[LuaCallCSharp] public static List<Type> list = new List<Type>
 		{
-			typeof(GameObject)
+			typeof(GameObject),
+			typeof(Button)
 		};
 
 		[GenPath]

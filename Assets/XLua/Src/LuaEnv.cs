@@ -479,13 +479,6 @@ namespace XLua
                     obj = { ['.fqn'] = fqn }
                     setmetatable(obj, metatable)
                 elseif obj == true then
-                    local mt = debug.getregistry()[fqn]
-                    if mt and lookup then
-                        local index = lookup[fqn]
-                        if index then
-                            mt.__index = index(mt.__index)
-                        end
-                    end
                     return rawget(self, key)
                 end
 

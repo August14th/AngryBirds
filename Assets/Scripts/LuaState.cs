@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using XLua;
 using System.IO;
+using UnityEngine.UI;
 
 public class LuaState : MonoBehaviour
 {
@@ -23,7 +24,6 @@ public class LuaState : MonoBehaviour
 
 			return null;
 		});
-		luaEnv.DoString("lookup = require 'lookup'");
 		LuaEnv = luaEnv;
 	}
 

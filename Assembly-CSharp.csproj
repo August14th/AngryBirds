@@ -61,6 +61,7 @@
     <Compile Include="Assets\Scripts\Boom.cs" />
     <Compile Include="Assets\Scripts\Brick.cs" />
     <Compile Include="Assets\Scripts\Bundles.cs" />
+    <Compile Include="Assets\Scripts\ButtonX.cs" />
     <Compile Include="Assets\Scripts\CameraFollow.cs" />
     <Compile Include="Assets\Scripts\CameraMove.cs" />
     <Compile Include="Assets\Scripts\CRC32.cs" />
@@ -71,11 +72,13 @@
     <Compile Include="Assets\Scripts\GameBehaviour.cs" />
     <Compile Include="Assets\Scripts\GameManger.cs" />
     <Compile Include="Assets\Scripts\GameObjectX.cs" />
+    <Compile Include="Assets\Scripts\GenCode\ButtonXWrap.cs" />
     <Compile Include="Assets\Scripts\GenCode\DelegatesGensBridge.cs" />
     <Compile Include="Assets\Scripts\GenCode\EnumWrap.cs" />
     <Compile Include="Assets\Scripts\GenCode\GameObjectXWrap.cs" />
     <Compile Include="Assets\Scripts\GenCode\PackUnpack.cs" />
     <Compile Include="Assets\Scripts\GenCode\UnityEngine_GameObjectWrap.cs" />
+    <Compile Include="Assets\Scripts\GenCode\UnityEngine_UI_ButtonWrap.cs" />
     <Compile Include="Assets\Scripts\GenCode\WrapPusher.cs" />
     <Compile Include="Assets\Scripts\GenCode\XLuaGenAutoRegister.cs" />
     <Compile Include="Assets\Scripts\GreenBird.cs" />
