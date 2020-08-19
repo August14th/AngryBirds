@@ -483,13 +483,13 @@ namespace XLua
                     if index then
                         local mt = debug.getregistry()[fqn]
                         mt.__index = index(mt.__index)
-                        print('extends __index on class', fqn)
+                        -- print('extends __index on class', fqn)
                     end
                     local newindex = G_newindex['CS.'..fqn]
                     if newindex then
                         local mt = debug.getregistry()[fqn]
                         mt.__newindex = newindex(mt.__newindex)
-                        print('extends __newindex on class', fqn)
+                        -- print('extends __newindex on class', fqn)
                     end
                     return rawget(self, key)
                 end

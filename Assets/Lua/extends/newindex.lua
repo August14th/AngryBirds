@@ -11,7 +11,7 @@ _M['CS.UnityEngine.UI.Button'] = function(newindex)
                 onclick:RemoveAllListeners()
             end    
         else 
-            newindex(t, k)
+            newindex(t, k, v)
         end 
     end
 end
