@@ -319,6 +319,7 @@ public class Bundles : AssetLoader
                 var t = image.gameObject.AddComponent<DestroyCallback>();
                 t.Callback = () => RemoveRef(t.gameObject);
                 image.sprite = (Sprite) sprite;
+                break;
             }
         }
     }

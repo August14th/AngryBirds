@@ -42,7 +42,10 @@ public class Resources : AssetLoader
 		foreach (var sprite in sprites)
 		{
 			if (sprite && sprite is Sprite && sprite.name == spriteName)
+			{
 				image.sprite = (Sprite) sprite;
+				break;
+			}
 		}
 
 	}
