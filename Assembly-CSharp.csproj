@@ -63,12 +63,12 @@
     <Compile Include="Assets\Scripts\CameraMove.cs" />
     <Compile Include="Assets\Scripts\Core\AssetLoader.cs" />
     <Compile Include="Assets\Scripts\Core\Bundles.cs" />
+    <Compile Include="Assets\Scripts\Core\CRC32.cs" />
     <Compile Include="Assets\Scripts\Core\GameBehaviour.cs" />
     <Compile Include="Assets\Scripts\Core\GameEngine.cs" />
     <Compile Include="Assets\Scripts\Core\LuaState.cs" />
     <Compile Include="Assets\Scripts\Core\Resources.cs" />
     <Compile Include="Assets\Scripts\Core\Scenes.cs" />
-    <Compile Include="Assets\Scripts\CRC32.cs" />
     <Compile Include="Assets\Scripts\DestroyCallback.cs" />
     <Compile Include="Assets\Scripts\Destroyer.cs" />
     <Compile Include="Assets\Scripts\DontDestory.cs" />

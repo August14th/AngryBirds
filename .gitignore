@@ -9,3 +9,5 @@ Assets/Scripts/GenCode/
 Bundles/
 bundles.txt
 *.csproj
+Assets/Target/
+Assets/Lua/test.lua

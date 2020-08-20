@@ -9,9 +9,10 @@ using UnityEngine.SceneManagement;
 
 public class Bundles : AssetLoader
 {
-    private static readonly string HomeURI = "http://localhost:7070/D%3A/Projects/AngryBirds/";
 
-    private static readonly string BundleURI = HomeURI + "Bundles/";
+    private string _homeUri;
+
+    private string _bundleUri;
 
     private readonly Dictionary<object, HashSet<object>> _ins = new Dictionary<object, HashSet<object>>();
 
@@ -29,8 +30,10 @@ public class Bundles : AssetLoader
 
     private bool _done;
 
-    private void Start()
+    public void StartDownloads(string homeUri)
     {
+        _homeUri = homeUri;
+        _bundleUri = _homeUri + "Bundles/";
         StartCoroutine(DownloadBundles());
     }
 
@@ -123,7 +126,7 @@ public class Bundles : AssetLoader
 
     private IEnumerator DownloadBundles()
     {
-        var request = UnityWebRequest.Get(HomeURI + "bundles.txt");
+        var request = UnityWebRequest.Get(_homeUri + "bundles.txt");
         yield return request.SendWebRequest();
 
         if (request.isNetworkError || request.isHttpError)
@@ -182,7 +185,7 @@ public class Bundles : AssetLoader
         var folder = localFile.Directory;
         if (folder != null && !folder.Exists) folder.Create();
 
-        var request = UnityWebRequest.Get(BundleURI + file);
+        var request = UnityWebRequest.Get(_bundleUri + file);
         var tmpFile = new FileInfo(localFile.FullName + ".tmp");
         request.downloadHandler = new DownloadHandlerFile(tmpFile.FullName);
         yield return request.SendWebRequest();

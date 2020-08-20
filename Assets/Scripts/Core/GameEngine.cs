@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class GameEngine : MonoBehaviour
 {
+	public string ResourceUri = "http://localhost:7070/D%3A/Projects/AngryBirds/";
+	
 	// Use this for initialization
 	IEnumerator Start()
 	{
@@ -11,6 +13,7 @@ public class GameEngine : MonoBehaviour
 		var loader = gameObject.AddComponent<Resources>();
 #else
 		var loader = gameObject.AddComponent<Bundles>();
+		loader.StartDownloads(ResourceUri);
 #endif
 		while (!loader.IsDone())
 		{
