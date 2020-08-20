@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Resources : AssetLoader
 {
@@ -32,6 +33,18 @@ public class Resources : AssetLoader
 		}
 
 		return null;
+	}
+
+
+	public override void SetSprite(Image image, string atlasPath, string spriteName)
+	{
+		var sprites = UnityEngine.Resources.LoadAll(atlasPath);
+		foreach (var sprite in sprites)
+		{
+			if (sprite && sprite is Sprite && sprite.name == spriteName)
+				image.sprite = (Sprite) sprite;
+		}
+
 	}
 
 	public override bool IsDone()

@@ -6,6 +6,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class Bundles : AssetLoader
 {
@@ -302,6 +303,24 @@ public class Bundles : AssetLoader
     {
         var prefab = UnityEngine.Resources.Load<GameObject>(prefabName);
         return prefab;
+    }
+
+    public override void SetSprite(Image image, string atlasPath, string spriteName)
+    {
+        var bundleName = atlasPath.ToLower() + ".ab";
+        var bundle = Get(bundleName);
+        if (bundle == null) return;
+        var sprites = bundle.LoadAllAssets();
+        foreach (var sprite in sprites)
+        {
+            if (sprite && sprite is Sprite && sprite.name == spriteName)
+            {
+                AddRef(bundle, image.gameObject);
+                var t = image.gameObject.AddComponent<DestroyCallback>();
+                t.Callback = () => RemoveRef(t.gameObject);
+                image.sprite = (Sprite) sprite;
+            }
+        }
     }
 
     public override bool IsDone()

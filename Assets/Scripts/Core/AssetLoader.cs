@@ -1,5 +1,6 @@
 
 using UnityEngine;
+using UnityEngine.UI;
 
 public abstract class AssetLoader : MonoBehaviour
 {
@@ -22,6 +23,8 @@ public abstract class AssetLoader : MonoBehaviour
     public abstract void LoadScene(string sceneName);
 
     public abstract byte[] Require(ref string filepath);
+
+    public abstract void SetSprite(Image image, string atlasPath, string spriteName);
 
     public abstract bool IsDone();
 }

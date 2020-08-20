@@ -6,48 +6,44 @@ using UnityEngine.EventSystems;
 public class GameBehaviour : MonoBehaviour
 {
 
-	private static GameObject _engine;
+	private static GameEngine _engine;
 
-	private static GameObject GetEngine()
+	private static GameEngine GetEngine()
 	{
 		if (_engine == null)
 		{
-			_engine = GameObject.FindWithTag("GameEngine");
+			_engine = GameObject.FindWithTag("GameEngine").GetComponent<GameEngine>();
 		}
 
 		return _engine;
 	}
 
-	protected AssetLoader Assets
+	public static AssetLoader Assets
 	{
-#if UNITY_EDITOR
-		get { return GetEngine().GetComponent<Resources>(); }
-#else
-		get { return GetEngine().GetComponent<Bundles>(); }
-#endif
+		get { return GetEngine().Assets; }
 	}
 
-	protected GameObject Canvas
+	public static GameObject Canvas
 	{
 		get { return GameObject.Find("Canvas"); }
 	}
 
-	protected LuaState LuaState
+	public static LuaState LuaState
 	{
 		get { return GetEngine().GetComponent<LuaState>(); }
 	}
 
-	private Scenes Scenes
+	public static Scenes Scenes
 	{
 		get { return GetEngine().GetComponent<Scenes>(); }
 	}
 
-	protected bool IsBehindGUI()
+	public static bool IsBehindGUI()
 	{
 		return EventSystem.current.IsPointerOverGameObject();
 	}
 
-	protected void GotoScene(string sceneName)
+	public static void GotoScene(string sceneName)
 	{
 		Scenes.GotoScene(sceneName);
 	}

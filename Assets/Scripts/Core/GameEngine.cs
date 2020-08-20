@@ -1,13 +1,12 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class GameEngine : MonoBehaviour
 {
 	public string ResourceUri = "http://localhost:7070/D%3A/Projects/AngryBirds/";
-	
+
 	// Use this for initialization
-	IEnumerator Start()
+	private IEnumerator Start()
 	{
 #if UNITY_EDITOR
 		var loader = gameObject.AddComponent<Resources>();
@@ -19,10 +18,20 @@ public class GameEngine : MonoBehaviour
 		{
 			yield return null;
 		}
+
 		gameObject.AddComponent<LuaState>();
 		var scenes = gameObject.AddComponent<Scenes>();
-		
+
 		scenes.GotoScene("Main");
 	}
 
+
+	public AssetLoader Assets
+	{
+#if UNITY_EDITOR
+		get { return gameObject.GetComponent<Resources>(); }
+#else
+		get { return gameObject.GetComponent<Bundles>(); }
+#endif
+	}
 }
