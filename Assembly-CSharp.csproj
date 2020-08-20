@@ -75,7 +75,7 @@
     <Compile Include="Assets\Scripts\Enemy.cs" />
     <Compile Include="Assets\Scripts\Extends\ButtonX.cs" />
     <Compile Include="Assets\Scripts\Extends\GameObjectX.cs" />
-    <Compile Include="Assets\Scripts\Extends\Image.cs" />
+    <Compile Include="Assets\Scripts\Extends\ImageX.cs" />
     <Compile Include="Assets\Scripts\GameManger.cs" />
     <Compile Include="Assets\Scripts\GenCode\ButtonXWrap.cs" />
     <Compile Include="Assets\Scripts\GenCode\DelegatesGensBridge.cs" />
