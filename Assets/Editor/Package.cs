@@ -16,8 +16,14 @@ public class Package
 
 	private static readonly DirectoryInfo LuaFolder = new DirectoryInfo(Application.dataPath + "/Lua");
 
-	[MenuItem("Package/Encrypt")]
-	static void Encrypt()
+	[MenuItem("Package/Encrypt && Mark", false, 10)]
+	static void Prepare()
+	{
+		Encrypt();
+		Mark();
+	}
+	
+	private static void Encrypt()
 	{
 		if (TargetFolder.Exists) TargetFolder.Delete(true);
 		TargetFolder.Create();
@@ -26,8 +32,7 @@ public class Package
 		Debug.Log("Encryption ok, target folder:" + TargetFolder.Name);
 	}
 
-	[MenuItem("Package/Mark")]
-	static void Mark()
+	private static void Mark()
 	{
 		MarkResources("Assets/Resources");
 		Debug.Log("mark Resources ok.");
@@ -35,14 +40,19 @@ public class Package
 		Debug.Log("mark Lua codes ok.");
 	}
 
-	[MenuItem("Package/Build/Windows")]
+	[MenuItem("Package/Build/Windows", false, 20)]
 	static void BuildWindows()
 	{
 		Build(BuildTarget.StandaloneWindows64);
-		Debug.Log("Build " + BuildTarget.StandaloneWindows64 + " completed.");
+	}
+	
+	[MenuItem("Package/Build/Android", false, 21)]
+	static void BuildAndroid()
+	{
+		Build(BuildTarget.Android);
 	}
 
-	[MenuItem("Package/Clear")]
+	[MenuItem("Package/Clear", false, 30)]
 	static void Clear()
 	{
 		if (TargetFolder.Exists) TargetFolder.Delete(true);
@@ -70,6 +80,7 @@ public class Package
 
 		var bundlesFile = new FileInfo("bundles.txt");
 		File.WriteAllText(bundlesFile.FullName, string.Join("\n", lines.ToArray()));
+		Debug.Log("Build " + target + " completed.");
 	}
 
 	private static void MarkResources(string folder)
