@@ -5,7 +5,7 @@ using XLua;
 using System.IO;
 using UnityEngine.UI;
 
-public class LuaState : MonoBehaviour
+public class LuaState : GameBehaviour
 {
 
 	private LuaEnv LuaEnv;
@@ -13,7 +13,7 @@ public class LuaState : MonoBehaviour
 	public int DebugPort = 9966;
 
 	// Use this for initialization
-	private void Awake()
+	void Awake()
 	{
 		var luaEnv = new LuaEnv();
 #if UNITY_EDITOR
@@ -24,19 +24,12 @@ public class LuaState : MonoBehaviour
 			Debug.Log("lua starts, listen on port:" + DebugPort);
 		}
 #endif
-		luaEnv.AddLoader((ref string filepath) =>
-		{
-			filepath = Application.dataPath + "/Lua/" + filepath.Replace('.', '/') + ".lua";
-			if (File.Exists(filepath))
-			{
-				return File.ReadAllBytes(filepath);
-			}
+		luaEnv.AddLoader((ref string filepath) => Assets.Require(ref filepath));
 
-			return null;
-		});
 		luaEnv.DoString("G_index = require 'extends.index'");
 		luaEnv.DoString("G_newindex = require 'extends.newindex'");
 		luaEnv.DoString("require 'extends.extends'");
+		luaEnv.DoString("local l = require 'lose_panel'; l();");
 		LuaEnv = luaEnv;
 	}
 

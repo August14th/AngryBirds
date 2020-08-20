@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 
-public class Bundles : MonoBehaviour
+public class Bundles : AssetLoader
 {
     private static readonly string HomeURI = "http://localhost:7070/D%3A/Projects/AngryBirds/";
 
@@ -15,7 +15,8 @@ public class Bundles : MonoBehaviour
 
     private readonly Dictionary<object, HashSet<object>> _ins = new Dictionary<object, HashSet<object>>();
 
-    private readonly Dictionary<object, HashSet<AssetBundle>> _outs = new Dictionary<object, HashSet<AssetBundle>>();
+    private readonly Dictionary<object, HashSet<AssetBundle>>
+        _outs = new Dictionary<object, HashSet<AssetBundle>>();
 
     private readonly Dictionary<string, AssetBundle> _bundles = new Dictionary<string, AssetBundle>();
 
@@ -25,6 +26,8 @@ public class Bundles : MonoBehaviour
     {
         get { return Path.Combine(Application.persistentDataPath, "Bundles"); }
     }
+
+    private bool _done;
 
     private void Start()
     {
@@ -47,7 +50,7 @@ public class Bundles : MonoBehaviour
     private void RemoveBundle(string bundleName)
     {
         AssetBundle bundle;
-        if(_bundles.TryGetValue(bundleName, out bundle)) RemoveRef(bundle);
+        if (_bundles.TryGetValue(bundleName, out bundle)) RemoveRef(bundle);
     }
 
     public void RemoveRef(object go)
@@ -92,7 +95,7 @@ public class Bundles : MonoBehaviour
     private void LoadBundle(string bundleName)
     {
         string fileName;
-        if(!_bundleFiles.TryGetValue(bundleName, out fileName))
+        if (!_bundleFiles.TryGetValue(bundleName, out fileName))
             throw new Exception("bundle file of " + bundleName + " not found!");
 
         var bundle = AssetBundle.LoadFromFile(Path.Combine(LocalPath, fileName));
@@ -157,6 +160,7 @@ public class Bundles : MonoBehaviour
             yield return DownloadBundle(remote);
         }
 
+        _done = true;
         Debug.Log("All Bundles are downloaded.");
     }
 
@@ -203,8 +207,23 @@ public class Bundles : MonoBehaviour
 
         request.Dispose();
     }
-    
-    public GameObject NewActor(string prefabName, Vector3 position)
+
+    public override byte[] Require(ref string file)
+    {
+        var bundleName = "lua.ab";
+        var bundle = Get(bundleName);
+        if (bundle == null) return null;
+        var luaFile = bundle.LoadAsset<TextAsset>(file + ".lua.txt");
+        if (luaFile == null)
+        {
+            Debug.LogWarning("lua file not found:" + file);
+            return null;
+        }
+
+        return luaFile.bytes;
+    }
+
+    public override GameObject NewActor(string prefabName, Vector3 position)
     {
         AssetBundle bundle;
         var prefab = LoadPrefab(prefabName, out bundle);
@@ -228,18 +247,18 @@ public class Bundles : MonoBehaviour
         return null;
     }
 
-    
-    public GameObject NewUI(string prefabName, Transform parent)
+
+    public override GameObject NewUI(string prefabName, Transform parent)
     {
         AssetBundle bundle;
         var prefab = LoadPrefab(prefabName, out bundle);
         if (prefab != null)
         {
             var ui = Instantiate(prefab, parent.transform, false);
-            
+
             var t = ui.AddComponent<DestroyCallback>();
             t.Callback = () => RemoveRef(t.gameObject);
-            
+
             AddRef(bundle, ui);
             return ui;
         }
@@ -253,7 +272,7 @@ public class Bundles : MonoBehaviour
         return null;
     }
 
-    public void LoadScene(string sceneName)
+    public override void LoadScene(string sceneName)
     {
         var currentBundleName = SceneBundleName(SceneManager.GetActiveScene().name);
         RemoveBundle(currentBundleName);
@@ -261,7 +280,7 @@ public class Bundles : MonoBehaviour
         var bundleName = SceneBundleName(sceneName);
         Get(bundleName);
     }
-    
+
     private string SceneBundleName(string sceneName)
     {
         return "scenes/" + sceneName.ToLower() + ".ab";
@@ -275,10 +294,16 @@ public class Bundles : MonoBehaviour
         var prefab = bundle.LoadAsset<GameObject>(prefabName);
         return prefab;
     }
-    
+
     private GameObject LoadFromResources(string prefabName)
     {
-        var prefab = Resources.Load<GameObject>(prefabName);
+        var prefab = UnityEngine.Resources.Load<GameObject>(prefabName);
         return prefab;
     }
+
+    public override bool IsDone()
+    {
+        return _done;
+    }
+
 }

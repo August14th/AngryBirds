@@ -6,7 +6,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
 
-public class Scenes : ShortCut
+public class Scenes : GameBehaviour
 {
 	private float minTime = 3;
 	

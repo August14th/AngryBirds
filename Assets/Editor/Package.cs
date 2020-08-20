@@ -10,19 +10,45 @@ public class Package
 
 	private static readonly string OupPutFolder = "Bundles";
 
+	private static uint Version = 1;
+
+	private static readonly DirectoryInfo TargetFolder = new DirectoryInfo(Application.dataPath + "/Target");
+
+	private static readonly DirectoryInfo LuaFolder = new DirectoryInfo(Application.dataPath + "/Lua");
+
+	[MenuItem("Package/Encrypt")]
+	static void Encrypt()
+	{
+		if (TargetFolder.Exists) TargetFolder.Delete(true);
+		TargetFolder.Create();
+		EncryptLuaFiles(LuaFolder);
+		AssetDatabase.Refresh();
+		Debug.Log("Encryption ok, target folder:" + TargetFolder.Name);
+	}
+
 	[MenuItem("Package/Mark")]
 	static void Mark()
 	{
-		MarkAssetBundleLabels("Assets/Resources");
+		MarkResources("Assets/Resources");
+		Debug.Log("mark Resources ok.");
+		MarkLuaCodes("Assets/Target");
+		Debug.Log("mark Lua codes ok.");
 	}
-
-	private static uint Version = 1;
 
 	[MenuItem("Package/Build/Windows")]
 	static void BuildWindows()
 	{
 		Build(BuildTarget.StandaloneWindows64);
+		Debug.Log("Build " + BuildTarget.StandaloneWindows64 + " completed.");
 	}
+
+	[MenuItem("Package/Clear")]
+	static void Clear()
+	{
+		if (TargetFolder.Exists) TargetFolder.Delete(true);
+		Debug.Log("clear target folder ok.");
+	}
+
 
 	private static void Build(BuildTarget target)
 	{
@@ -44,11 +70,9 @@ public class Package
 
 		var bundlesFile = new FileInfo("bundles.txt");
 		File.WriteAllText(bundlesFile.FullName, string.Join("\n", lines.ToArray()));
-
-		Debug.Log("Build " + target + " completed.");
 	}
 
-	private static void MarkAssetBundleLabels(string folder)
+	private static void MarkResources(string folder)
 	{
 		var assets = AssetDatabase.FindAssets(null, new[] {folder});
 		foreach (var asset in assets)
@@ -56,7 +80,7 @@ public class Package
 			string assetPath = AssetDatabase.GUIDToAssetPath(asset);
 			if (AssetDatabase.IsValidFolder(assetPath))
 			{
-				MarkAssetBundleLabels(assetPath);
+				MarkResources(assetPath);
 			}
 			else
 			{
@@ -69,6 +93,45 @@ public class Package
 		}
 
 		AssetDatabase.RemoveUnusedAssetBundleNames();
-		Debug.Log(folder + ": Mark AssetBundle Labels ok.");
 	}
+
+	private static void MarkLuaCodes(string folder)
+	{
+		var assets = AssetDatabase.FindAssets(null, new[] {folder});
+		foreach (var asset in assets)
+		{
+			string assetPath = AssetDatabase.GUIDToAssetPath(asset);
+
+			var importer = AssetImporter.GetAtPath(assetPath);
+			if (importer.assetBundleName != "lua") importer.assetBundleName = "lua";
+			if (importer.assetBundleVariant != "ab") importer.assetBundleVariant = "ab";
+			if (AssetDatabase.IsValidFolder(assetPath))
+			{
+				MarkLuaCodes(assetPath);
+			}
+		}
+
+		AssetDatabase.RemoveUnusedAssetBundleNames();
+	}
+
+	private static void EncryptLuaFiles(DirectoryInfo sourceFolder, string path = null)
+	{
+		var files = sourceFolder.GetFiles("*.lua");
+		foreach (var file in files)
+		{
+			var filePath = path == null ? file.Name : path + "." + file.Name;
+			file.CopyTo(Path.Combine(TargetFolder.FullName, filePath + ".txt"));
+		}
+
+		var folders = sourceFolder.GetDirectories();
+		foreach (var folder in folders)
+		{
+			if (!folder.Name.StartsWith("."))
+			{
+				var folderPath = path == null ? folder.Name : path + "." + folder.Name;
+				EncryptLuaFiles(folder, folderPath);
+			}
+		}
+	}
+
 }

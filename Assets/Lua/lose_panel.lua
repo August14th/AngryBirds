@@ -1,7 +1,7 @@
-local shortcut = require "shortcut"
+local base = require "base"
 local class = require "class"
 
-local _M = class({prefab_name = "prefab/LosePanel"}, shortcut)
+local _M = class({prefab_name = "prefab/LosePanel"}, base)
 
 function _M:ctor()
     local assets = self:Assets()
