@@ -133,6 +133,7 @@ public class Bundles : Resources
         if (request.isNetworkError || request.isHttpError)
         {
             Debug.LogError("Download bundles.txt failed:" + request.error);
+            yield break;
         }
 
         var text = request.downloadHandler.text;

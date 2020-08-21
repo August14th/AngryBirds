@@ -222,7 +222,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d3f429f7f520d3469edb8625681e554, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ResourceUri: http://localhost:7070/D%3A/Projects/AngryBirds/
+  ResourceUri: http://192.168.0.196:7070/D%3A/Projects/AngryBirds/
 --- !u!4 &634715447
 Transform:
   m_ObjectHideFlags: 0
