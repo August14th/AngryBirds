@@ -38,7 +38,7 @@ public class GameManger : GameBehaviour
         switch (_state)
         {
             case State.Idle:
-                if (Input.GetMouseButtonDown(0)) TakeNextBird();
+                if (Input.GetMouseButtonDown(0) && !IsBehindGUI()) TakeNextBird();
                 break;
             case State.Flying:
                 if (BricksBirdsPigsStoppedMoving())

@@ -8,7 +8,7 @@ using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class Bundles : AssetLoader
+public class Bundles : Resources
 {
 
     private string _homeUri;
@@ -242,13 +242,7 @@ public class Bundles : AssetLoader
             return actor;
         }
 
-        prefab = LoadFromResources(prefabName);
-        if (prefab != null)
-        {
-            return Instantiate(prefab, position, Quaternion.identity);
-        }
-
-        return null;
+        return base.NewActor(prefabName, position);
     }
 
 
@@ -267,13 +261,7 @@ public class Bundles : AssetLoader
             return ui;
         }
 
-        prefab = LoadFromResources(prefabName);
-        if (prefab != null)
-        {
-            return Instantiate(prefab, parent.transform, false);
-        }
-
-        return null;
+        return base.NewUI(prefabName, parent);
     }
 
     public override void LoadScene(string sceneName)
@@ -299,29 +287,29 @@ public class Bundles : AssetLoader
         return prefab;
     }
 
-    private GameObject LoadFromResources(string prefabName)
-    {
-        var prefab = UnityEngine.Resources.Load<GameObject>(prefabName);
-        return prefab;
-    }
-
     public override void SetSprite(Image image, string atlasPath, string spriteName)
     {
         var bundleName = atlasPath.ToLower() + ".ab";
         var bundle = Get(bundleName);
-        if (bundle == null) return;
-        var sprites = bundle.LoadAllAssets();
-        foreach (var sprite in sprites)
+        if (bundle != null)
         {
-            if (sprite && sprite is Sprite && sprite.name == spriteName)
+            foreach (var sprite in bundle.LoadAllAssets<Sprite>())
             {
-                AddRef(bundle, image.gameObject);
-                var t = image.gameObject.AddComponent<DestroyCallback>();
-                t.Callback = () => RemoveRef(t.gameObject);
-                image.sprite = (Sprite) sprite;
-                break;
+                if (sprite.name == spriteName)
+                {
+                    AddRef(bundle, image.gameObject);
+                    var t = image.gameObject.AddComponent<DestroyCallback>();
+                    t.Callback = () => RemoveRef(t.gameObject);
+                    image.sprite = sprite;
+                    break;
+                }
             }
         }
+        else
+        {
+            base.SetSprite(image, atlasPath, spriteName);
+        }
+
     }
 
     public override bool IsDone()

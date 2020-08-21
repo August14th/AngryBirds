@@ -227,7 +227,6 @@ GameObject:
   - component: {fileID: 85893396}
   - component: {fileID: 85893395}
   - component: {fileID: 85893394}
-  - component: {fileID: 85893398}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -311,19 +310,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!114 &85893398
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 85893393}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 77df196ee05e48d4cb26c88a962b2aa8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  PauseBtn: {fileID: 994683203}
-  PausePanel: {fileID: 1784132685253358, guid: de87791e560d6d84b81d8cd770fee1fa, type: 2}
 --- !u!1 &139308989
 GameObject:
   m_ObjectHideFlags: 0
@@ -539,9 +525,6 @@ MonoBehaviour:
   - {fileID: 1441449690}
   - {fileID: 2101133996}
   SlingShot: {fileID: 269792424}
-  LosePanel: {fileID: 1033521759902764, guid: 2add9761301ff0a49851154d5a3f69e1, type: 2}
-  WinPanel: {fileID: 1137705098636410, guid: d163aa25e86dd414d9d4dda4425b2590, type: 2}
-  Canvas: {fileID: 85893393}
   Level: 1-1
 --- !u!114 &218610992
 MonoBehaviour:
@@ -1390,6 +1373,7 @@ GameObject:
   - component: {fileID: 994683205}
   - component: {fileID: 994683204}
   - component: {fileID: 994683203}
+  - component: {fileID: 994683206}
   m_Layer: 5
   m_Name: PauseBtn
   m_TagString: Untagged
@@ -1489,6 +1473,17 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 994683201}
+--- !u!114 &994683206
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 994683201}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dfe1b69e65e112d4a81b076f4b033f3c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1404037545
 GameObject:
   m_ObjectHideFlags: 0

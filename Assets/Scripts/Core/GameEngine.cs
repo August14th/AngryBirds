@@ -5,33 +5,45 @@ public class GameEngine : MonoBehaviour
 {
 	public string ResourceUri = "http://localhost:7070/D%3A/Projects/AngryBirds/";
 
-	// Use this for initialization
+	private AssetLoader _assetLoader;
+
+	private LuaState _luaState;
+
+	private Scenes _scenes;
+
 	private IEnumerator Start()
 	{
-#if UNITY_EDITOR
-		var loader = gameObject.AddComponent<Resources>();
+#if !UNITY_EDITOR
+		_assetLoader = gameObject.AddComponent<Resources>();
 #else
-		var loader = gameObject.AddComponent<Bundles>();
-		loader.StartDownloads(ResourceUri);
+		var bundles = gameObject.AddComponent<Bundles>();
+		bundles.StartDownloads(ResourceUri);
+		_assetLoader = bundles;
 #endif
-		while (!loader.IsDone())
+		while (!_assetLoader.IsDone())
 		{
 			yield return null;
 		}
 
-		gameObject.AddComponent<LuaState>();
-		var scenes = gameObject.AddComponent<Scenes>();
+		_luaState = gameObject.AddComponent<LuaState>();
+		_scenes = gameObject.AddComponent<Scenes>();
 
-		scenes.GotoScene("Main");
+		_scenes.GotoScene("Main");
 	}
 
 
 	public AssetLoader Assets
 	{
-#if UNITY_EDITOR
-		get { return gameObject.GetComponent<Resources>(); }
-#else
-		get { return gameObject.GetComponent<Bundles>(); }
-#endif
+		get { return _assetLoader; }
+	}
+
+	public LuaState LuaState
+	{
+		get { return _luaState; }
+	}
+
+	public Scenes Scenes
+	{
+		get { return _scenes; }
 	}
 }

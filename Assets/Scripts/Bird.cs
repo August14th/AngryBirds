@@ -55,7 +55,7 @@ public class Bird : GameBehaviour
     {
         if (IsFlying())
         {
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(0) && !IsBehindGUI())
             {
                 CastSkill();
             }

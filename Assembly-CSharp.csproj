@@ -93,6 +93,7 @@
     <Compile Include="Assets\Scripts\Map.cs" />
     <Compile Include="Assets\Scripts\MapPanel.cs" />
     <Compile Include="Assets\Scripts\ParallaxScrolling.cs" />
+    <Compile Include="Assets\Scripts\PauseBtn.cs" />
     <Compile Include="Assets\Scripts\PausePanel.cs" />
     <Compile Include="Assets\Scripts\Pig.cs" />
     <Compile Include="Assets\Scripts\SlingShot.cs" />

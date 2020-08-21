@@ -30,12 +30,12 @@ public class GameBehaviour : MonoBehaviour
 
 	public static LuaState LuaState
 	{
-		get { return GetEngine().GetComponent<LuaState>(); }
+		get { return GetEngine().LuaState; }
 	}
 
 	public static Scenes Scenes
 	{
-		get { return GetEngine().GetComponent<Scenes>(); }
+		get { return GetEngine().Scenes; }
 	}
 
 	public static bool IsBehindGUI()

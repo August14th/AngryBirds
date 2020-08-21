@@ -38,16 +38,15 @@ public class Resources : AssetLoader
 
 	public override void SetSprite(Image image, string atlasPath, string spriteName)
 	{
-		var sprites = UnityEngine.Resources.LoadAll(atlasPath);
+		var sprites = UnityEngine.Resources.LoadAll<Sprite>(atlasPath);
 		foreach (var sprite in sprites)
 		{
-			if (sprite && sprite is Sprite && sprite.name == spriteName)
+			if (sprite.name == spriteName)
 			{
-				image.sprite = (Sprite) sprite;
+				image.sprite = sprite;
 				break;
 			}
 		}
-
 	}
 
 	public override bool IsDone()

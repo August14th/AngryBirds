@@ -16,7 +16,6 @@ public class MainUI : GameBehaviour
         PauseBtn.onClick.AddListener(ShowPausePanel);
     }
 
-
     private void ShowPausePanel()
     {
         PauseBtn.gameObject.SetActive(false);
