@@ -141,6 +141,7 @@ public class Bundles : Resources
 
         var remotes = new HashSet<string>(text.Split('\n').ToList());
         var localFolder = new DirectoryInfo(LocalPath);
+        if(!localFolder.Exists) localFolder.Create();
         var locals = localFolder.GetFiles("*", SearchOption.AllDirectories).ToList();
 
         for (int i = locals.Count - 1; i >= 0; i--)

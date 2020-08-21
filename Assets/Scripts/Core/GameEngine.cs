@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class GameEngine : MonoBehaviour
 {
-	public string ResourceUri = "http://localhost:7070/D%3A/Projects/AngryBirds/";
+	public string ResourceUri = "http://192.168.0.196:7070/D%3A/Projects/AngryBirds/";
 
 	private AssetLoader _assetLoader;
 
@@ -13,7 +13,7 @@ public class GameEngine : MonoBehaviour
 
 	private IEnumerator Start()
 	{
-#if !UNITY_EDITOR
+#if UNITY_EDITOR
 		_assetLoader = gameObject.AddComponent<Resources>();
 #else
 		var bundles = gameObject.AddComponent<Bundles>();

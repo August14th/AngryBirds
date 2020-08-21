@@ -11,3 +11,4 @@ bundles.txt
 *.csproj
 Assets/Target/
 Assets/Lua/test.lua
+Package/
