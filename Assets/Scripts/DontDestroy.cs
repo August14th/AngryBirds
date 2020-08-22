@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DontDestory : GameBehaviour {
+public class DontDestroy : GameBehaviour {
 
 	// Use this for initialization
 	private void Awake()
