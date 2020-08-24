@@ -76,6 +76,7 @@
     <Compile Include="Assets\Scripts\Extends\ButtonX.cs" />
     <Compile Include="Assets\Scripts\Extends\GameObjectX.cs" />
     <Compile Include="Assets\Scripts\Extends\ImageX.cs" />
+    <Compile Include="Assets\Scripts\GameConfig.cs" />
     <Compile Include="Assets\Scripts\GameManger.cs" />
     <Compile Include="Assets\Scripts\GenCode\ButtonXWrap.cs" />
     <Compile Include="Assets\Scripts\GenCode\DelegatesGensBridge.cs" />
@@ -123,18 +124,10 @@
     <Compile Include="Assets\XLua\Src\TemplateEngine\TemplateEngine.cs" />
     <Compile Include="Assets\XLua\Src\TypeExtensions.cs" />
     <Compile Include="Assets\XLua\Src\Utils.cs" />
-    <None Include="Assets\Target\test.lua.txt" />
-    <None Include="Assets\Target\extends.newindex.lua.txt" />
     <None Include="Assets\XLua\Resources\xlua\util.lua.txt" />
-    <None Include="Assets\Target\extends.index.lua.txt" />
-    <None Include="Assets\Target\list.lua.txt" />
     <None Include="Assets\XLua\Resources\perf\profiler.lua.txt" />
     <None Include="Assets\Scripts\GenCode\link.xml" />
-    <None Include="Assets\Target\extends.extends.lua.txt" />
-    <None Include="Assets\Target\lose_panel.lua.txt" />
     <None Include="Assets\XLua\Resources\perf\memory.lua.txt" />
-    <None Include="Assets\Target\class.lua.txt" />
-    <None Include="Assets\Target\base.lua.txt" />
     <None Include="Assets\XLua\CHANGELOG.txt" />
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>D:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.CoreModule.dll</HintPath>
