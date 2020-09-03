@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class GameEngine : MonoBehaviour
 {
-	public string ResourceUri;
+	public string BundlesUri;
 
 	private AssetLoader _assetLoader;
 
@@ -14,10 +14,10 @@ public class GameEngine : MonoBehaviour
 	private IEnumerator Start()
 	{
 #if UNITY_EDITOR
-		_assetLoader = gameObject.AddComponent<Resources>();
+		_assetLoader = gameObject.AddComponent<LocalAsset>();
 #else
 		var bundles = gameObject.AddComponent<Bundles>();
-		bundles.StartDownloads(ResourceUri);
+		bundles.StartDownloads(BundlesUri);
 		_assetLoader = bundles;
 #endif
 		while (!_assetLoader.IsDone())

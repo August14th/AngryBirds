@@ -7,22 +7,18 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Object = UnityEngine.Object;
 
-public class Bundles : Resources
+public class Bundles : AssetLoader
 {
 
-    private string _homeUri;
-
+    private string platform = "pc";
+    
     private string _bundleUri;
-
-    private readonly Dictionary<object, HashSet<object>> _ins = new Dictionary<object, HashSet<object>>();
-
-    private readonly Dictionary<object, HashSet<AssetBundle>>
-        _outs = new Dictionary<object, HashSet<AssetBundle>>();
 
     private readonly Dictionary<string, AssetBundle> _bundles = new Dictionary<string, AssetBundle>();
 
-    private readonly Dictionary<string, string> _bundleFiles = new Dictionary<string, string>();
+    private readonly Dictionary<string, BundleInfo> _bundleInfos = new Dictionary<string, BundleInfo>();
 
     private static string LocalPath
     {
@@ -31,24 +27,10 @@ public class Bundles : Resources
 
     private bool _done;
 
-    public void StartDownloads(string homeUri)
+    public void StartDownloads(string bundlesPath)
     {
-        _homeUri = homeUri;
-        _bundleUri = _homeUri + "Bundles/";
+        _bundleUri = bundlesPath + platform + "/";
         StartCoroutine(DownloadBundles());
-    }
-
-    private void AddRef(AssetBundle bundle, GameObject go)
-    {
-        if (bundle == null) return;
-        _ins[bundle].Add(go);
-
-        if (!_outs.ContainsKey(go))
-        {
-            _outs[go] = new HashSet<AssetBundle>();
-        }
-
-        _outs[go].Add(bundle);
     }
 
     private void RemoveBundle(string bundleName)
@@ -57,11 +39,11 @@ public class Bundles : Resources
         if (_bundles.TryGetValue(bundleName, out bundle)) RemoveRef(bundle);
     }
 
-    public void RemoveRef(object go)
+    protected override void Unload(Object asset)
     {
-        if (_ins.Remove(go))
+        var bundle = asset as AssetBundle;
+        if (bundle != null)
         {
-            var bundle = go as AssetBundle;
             foreach (var ab in _bundles)
             {
                 if (ab.Value == bundle)
@@ -73,19 +55,8 @@ public class Bundles : Resources
                 }
             }
         }
-
-        HashSet<AssetBundle> outs;
-        if (_outs.TryGetValue(go, out outs))
-        {
-            _outs.Remove(go);
-            foreach (var @out in outs)
-            {
-                _ins[@out].Remove(go);
-                if (_ins[@out].Count == 0) RemoveRef(@out);
-            }
-        }
     }
-
+    
     private AssetBundle Get(string bundleName)
     {
         if (!_bundles.ContainsKey(bundleName))
@@ -98,28 +69,25 @@ public class Bundles : Resources
 
     private void LoadBundle(string bundleName)
     {
-        string fileName;
-        if (!_bundleFiles.TryGetValue(bundleName, out fileName))
+        BundleInfo info;
+        if (!_bundleInfos.TryGetValue(bundleName, out info))
             throw new Exception("bundle file of " + bundleName + " not found!");
 
-        var bundle = AssetBundle.LoadFromFile(Path.Combine(LocalPath, fileName));
+        var bundle = AssetBundle.LoadFromFile(Path.Combine(LocalPath, info.fileName()));
         Debug.Log("Load asset bundle:" + bundleName);
         _bundles[bundleName] = bundle;
-        _ins[bundle] = new HashSet<object>();
-        _outs[bundle] = new HashSet<AssetBundle>();
 
         var dependencies = GetDependencies(bundleName);
         foreach (var dependency in dependencies)
         {
             var dependent = Get(dependency);
-            _ins[dependent].Add(bundle);
-            _outs[bundle].Add(dependent);
+            AddRef(bundle, dependent);
         }
     }
 
     private string[] GetDependencies(string bundle)
     {
-        var bundles = Get("Bundles");
+        var bundles = Get(platform);
         var manifest = bundles.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
         return manifest.GetDirectDependencies(bundle);
     }
@@ -127,20 +95,24 @@ public class Bundles : Resources
 
     private IEnumerator DownloadBundles()
     {
-        var request = UnityWebRequest.Get(_homeUri + "bundles.txt");
+        var request = UnityWebRequest.Get(_bundleUri + "bundles.json");
         yield return request.SendWebRequest();
 
         if (request.isNetworkError || request.isHttpError)
         {
-            Debug.LogError("Download bundles.txt failed:" + request.error);
+            Debug.LogError("Download bundles.json failed:" + request.error);
             yield break;
         }
 
         var text = request.downloadHandler.text;
 
         request.Dispose();
-
-        var remotes = new HashSet<string>(text.Split('\n').ToList());
+        var jsonList = new HashSet<string>(text.Split('\n').ToList());
+        var remotes = new List<BundleInfo>();
+        foreach (var json in jsonList)
+        {
+            remotes.Add(JsonUtility.FromJson<BundleInfo>(json));
+        }
         var localFolder = new DirectoryInfo(LocalPath);
         if(!localFolder.Exists) localFolder.Create();
         var locals = localFolder.GetFiles("*", SearchOption.AllDirectories).ToList();
@@ -149,13 +121,12 @@ public class Bundles : Resources
         {
             var relativePath = locals[i].FullName.Substring(LocalPath.Length + 1);
             var file = relativePath.Replace(Path.DirectorySeparatorChar.ToString(), "/");
-            if (remotes.Contains(file))
+            var found = remotes.Find(b => b.fileName() == file);
+            if (found != null)
             {
                 locals.RemoveAt(i);
-                remotes.Remove(file);
-                string bundle, crc32;
-                Parse(file, out bundle, out crc32);
-                _bundleFiles[bundle] = file;
+                remotes.Remove(found);
+                _bundleInfos[found.name] = found;
             }
         }
 
@@ -170,25 +141,14 @@ public class Bundles : Resources
         Debug.Log("All Bundles are downloaded.");
     }
 
-    private void Parse(string file, out string bundle, out string crc32)
+    private IEnumerator DownloadBundle(BundleInfo info)
     {
-        var sep = file.LastIndexOf('.');
-        bundle = file.Substring(0, sep);
-        crc32 = file.Substring(sep + 1);
-    }
-
-
-    private IEnumerator DownloadBundle(string file)
-    {
-        string bundle, crc32String;
-        Parse(file, out bundle, out crc32String);
-
-        var localFile = new FileInfo(Path.Combine(LocalPath, file));
+        var localFile = new FileInfo(Path.Combine(LocalPath, info.fileName()));
         if (localFile.Exists) localFile.Delete();
         var folder = localFile.Directory;
         if (folder != null && !folder.Exists) folder.Create();
 
-        var request = UnityWebRequest.Get(_bundleUri + file);
+        var request = UnityWebRequest.Get(_bundleUri + info.fileName());
         var tmpFile = new FileInfo(localFile.FullName + ".tmp");
         request.downloadHandler = new DownloadHandlerFile(tmpFile.FullName);
         yield return request.SendWebRequest();
@@ -196,16 +156,16 @@ public class Bundles : Resources
         if (request.isNetworkError || request.isHttpError)
         {
             if (tmpFile.Exists) tmpFile.Delete();
-            Debug.LogError("Download Bundle:" + file + " failed:" + request.error);
+            Debug.LogError("Download Bundle:" + info.fileName() + " failed:" + request.error);
         }
         else
         {
             var crc32 = CRC32.GetCRC32(File.ReadAllBytes(tmpFile.FullName)).ToString("X").ToLower();
-            if (crc32 == crc32String)
+            if (crc32 == info.checksum)
             {
                 tmpFile.MoveTo(localFile.FullName);
-                _bundleFiles[bundle] = file;
-                Debug.Log("Download Bundle:" + bundle + " ok");
+                _bundleInfos[info.name] = info;
+                Debug.Log("Download Bundle:" + info.name + " ok");
             }
             else tmpFile.Delete();
 
@@ -240,11 +200,11 @@ public class Bundles : Resources
             var t = actor.AddComponent<DestroyCallback>();
             t.Callback = () => RemoveRef(t.gameObject);
 
-            AddRef(bundle, actor);
+            AddRef(actor, bundle);
             return actor;
         }
 
-        return base.NewActor(prefabName, position);
+        return null;
     }
 
 
@@ -258,12 +218,11 @@ public class Bundles : Resources
 
             var t = ui.AddComponent<DestroyCallback>();
             t.Callback = () => RemoveRef(t.gameObject);
-
-            AddRef(bundle, ui);
+            AddRef(ui, bundle);
             return ui;
         }
 
-        return base.NewUI(prefabName, parent);
+        return null;
     }
 
     public override void LoadScene(string sceneName)
@@ -285,7 +244,7 @@ public class Bundles : Resources
         var bundleName = prefabName.ToLower() + ".ab";
         bundle = Get(bundleName);
         if (bundle == null) return null;
-        var prefab = bundle.LoadAsset<GameObject>(prefabName);
+        var prefab = bundle.LoadAsset<GameObject>(prefabName.Substring(prefabName.LastIndexOf("/") + 1));
         return prefab;
     }
 
@@ -307,11 +266,6 @@ public class Bundles : Resources
                 }
             }
         }
-        else
-        {
-            base.SetSprite(image, atlasPath, spriteName);
-        }
-
     }
 
     public override bool IsDone()
@@ -319,4 +273,22 @@ public class Bundles : Resources
         return _done;
     }
 
+}
+
+class BundleInfo
+{
+    public BundleInfo(string name, string checksum)
+    {
+        this.name = name;
+        this.checksum = checksum;
+    }
+
+    public string name;
+
+    public string checksum;
+
+    public string fileName()
+    {
+        return name + "." + checksum;
+    }
 }

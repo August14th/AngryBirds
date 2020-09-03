@@ -21,7 +21,7 @@ public class LuaState : GameBehaviour
 		{
 			luaEnv.DoString("local dbg = require('emmy_core'); " +
 			                "dbg.tcpListen('localhost', " + DebugPort + ")");
-			Debug.Log("lua starts, listen on port:" + DebugPort);
+			Debug.Log("lua debugger starts, listen on port:" + DebugPort);
 		}
 #endif
 		luaEnv.AddLoader((ref string filepath) => Assets.Require(ref filepath));
