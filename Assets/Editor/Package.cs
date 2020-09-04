@@ -17,9 +17,11 @@ public class Package
 
     private static readonly string BundlesFolder = "Bundles";
 
+    private static readonly string PackageFolder = "Package";
+
     private static uint Version = 1;
 
-    private static readonly List<string> BundlesInPackage = new List<string> {"Loading"};
+    private static readonly List<string> BuiltinBundles = new List<string> {"Loading.ab"};
 
     [MenuItem("Package/Encrypt && Mark", false, 10)]
     static void Prepare()
@@ -56,20 +58,22 @@ public class Package
         BuildBundles(BuildTarget.Android);
     }
 
+    [MenuItem("Package/BuildPackage/Windows", false, 30)]
+    static void PackageWindows()
+    {
+        BuildPackage(BuildTarget.StandaloneWindows64);
+    }
+
+    [MenuItem("Package/BuildPackage/Android", false, 31)]
+    static void PackageAndroid()
+    {
+        BuildPackage(BuildTarget.Android);
+    }
+
     private static void BuildBundles(BuildTarget target)
     {
-        string platform;
-        switch (target)
-        {
-            case BuildTarget.Android:
-                platform = "android";
-                break;
-            case BuildTarget.StandaloneWindows64:
-                platform = "pc";
-                break;
-            default: 
-                throw new Exception("Not support:" + target);
-        }
+        string platform = Platform(target);
+
         var buildPath = BuildFolder + "/" + platform;
         var buildFolder = new DirectoryInfo(buildPath);
         if (!buildFolder.Exists) buildFolder.Create();
@@ -92,8 +96,76 @@ public class Package
             lines.Add(JsonUtility.ToJson(new BundleInfo(bundleName, checksum)));
         }
 
-        File.WriteAllText(bundlesFolder + "/bundles.json", string.Join("\n", lines.ToArray()));
+        File.WriteAllText(bundlesFolder + "/bundles.txt", string.Join("\n", lines.ToArray()));
         Debug.Log("Build " + target + " completed.");
+    }
+
+    private static string Platform(BuildTarget target)
+    {
+        switch (target)
+        {
+            case BuildTarget.Android:
+                return "android";
+            case BuildTarget.StandaloneWindows64:
+                return "windows";
+            case BuildTarget.iOS:
+                return "ios";
+            default:
+                throw new Exception("Not support:" + target);
+        }
+    }
+
+    private static void BuildPackage(BuildTarget target)
+    {
+        var streamingAssetPath = Application.dataPath + "/StreamingAssets";
+        var streamingAssetFolder = new DirectoryInfo(streamingAssetPath);
+        if (streamingAssetFolder.Exists) streamingAssetFolder.Delete(true);
+        streamingAssetFolder.Create();
+        var bundlesPath = BundlesFolder + "/" + Platform(target) + "/";
+        var lines = File.ReadAllLines(bundlesPath + "bundles.txt");
+        var bundles = new List<BundleInfo>();
+        foreach (var line in lines)
+        {
+            bundles.Add(JsonUtility.FromJson<BundleInfo>(line));
+        }
+
+        var builtin = new List<string>();
+        if (BuiltinBundles.Contains("*"))
+            foreach (var bundle in bundles)
+            {
+                var bundleFile = new FileInfo(bundlesPath + bundle.fileName());
+                bundleFile.CopyTo(streamingAssetPath + "/" + bundle.fileName());
+                builtin.Add(JsonUtility.ToJson(bundle));
+            }
+        else
+            foreach (var bundle in BuiltinBundles)
+            {
+                var found = bundles.Find(f => f.name == bundle.ToLower());
+                var bundleFile = new FileInfo(bundlesPath + found.fileName());
+                bundleFile.CopyTo(streamingAssetPath + "/" + found.fileName());
+                builtin.Add(JsonUtility.ToJson(found));
+            }
+        File.WriteAllText("Assets/Resources/bundles.txt", string.Join("\n", builtin.ToArray()));
+        string[] levels = {"Assets/Start.unity"};
+        var targetPath = PackageFolder + "/" + Platform(target) + "/AngryBirds." + Suffix(target);
+        var targetFile = new FileInfo(targetPath);
+        if (targetFile.Exists) targetFile.Delete();
+        if (!targetFile.Directory.Exists) targetFile.Directory.Create();
+        BuildPipeline.BuildPlayer(levels, targetPath, target, BuildOptions.None);
+        Debug.Log("Package created, path:" + targetPath);
+    }
+
+    private static string Suffix(BuildTarget target)
+    {
+        switch (target)
+        {
+            case BuildTarget.Android:
+                return "apk";
+            case BuildTarget.StandaloneWindows64:
+                return "exe";
+            default:
+                throw new Exception("Not support:" + target);
+        }
     }
 
     private static void MarkAssets()
@@ -168,4 +240,9 @@ class BundleInfo
     public string name;
 
     public string checksum;
+
+    public string fileName()
+    {
+        return name + "." + checksum;
+    }
 }

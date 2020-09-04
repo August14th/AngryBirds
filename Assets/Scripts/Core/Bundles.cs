@@ -11,9 +11,15 @@ using Object = UnityEngine.Object;
 
 public class Bundles : AssetLoader
 {
-
-    private string platform = "pc";
-    
+    #if UNITY_ANDROID
+    private string platform = "android";
+    #endif
+    #if UNITY_IPHONE
+        private string platform = "ios";
+    #endif
+    #if UNITY_STANDALONE_WIN
+        private string platform = "windows";
+    #endif
     private string _bundleUri;
 
     private readonly Dictionary<string, AssetBundle> _bundles = new Dictionary<string, AssetBundle>();
@@ -73,7 +79,7 @@ public class Bundles : AssetLoader
         if (!_bundleInfos.TryGetValue(bundleName, out info))
             throw new Exception("bundle file of " + bundleName + " not found!");
 
-        var bundle = AssetBundle.LoadFromFile(Path.Combine(LocalPath, info.fileName()));
+        var bundle = AssetBundle.LoadFromFile(info.path);
         Debug.Log("Load asset bundle:" + bundleName);
         _bundles[bundleName] = bundle;
 
@@ -95,12 +101,12 @@ public class Bundles : AssetLoader
 
     private IEnumerator DownloadBundles()
     {
-        var request = UnityWebRequest.Get(_bundleUri + "bundles.json");
+        var request = UnityWebRequest.Get(_bundleUri + "bundles.txt");
         yield return request.SendWebRequest();
 
         if (request.isNetworkError || request.isHttpError)
         {
-            Debug.LogError("Download bundles.json failed:" + request.error);
+            Debug.LogError("Download bundles.txt failed:" + request.error);
             yield break;
         }
 
@@ -111,10 +117,12 @@ public class Bundles : AssetLoader
         var remotes = new List<BundleInfo>();
         foreach (var json in jsonList)
         {
-            remotes.Add(JsonUtility.FromJson<BundleInfo>(json));
+            var bundleInfo = JsonUtility.FromJson<BundleInfo>(json);
+            remotes.Add(bundleInfo);
         }
+        // 本地的已经有的bundles
         var localFolder = new DirectoryInfo(LocalPath);
-        if(!localFolder.Exists) localFolder.Create();
+        if (!localFolder.Exists) localFolder.Create();
         var locals = localFolder.GetFiles("*", SearchOption.AllDirectories).ToList();
 
         for (int i = locals.Count - 1; i >= 0; i--)
@@ -124,19 +132,39 @@ public class Bundles : AssetLoader
             var found = remotes.Find(b => b.fileName() == file);
             if (found != null)
             {
+                found.path = locals[i].FullName;
                 locals.RemoveAt(i);
                 remotes.Remove(found);
                 _bundleInfos[found.name] = found;
             }
         }
 
+        // 删除已经过期的bundles
         locals.ForEach(d => d.Delete());
+        // 存在于streamingAssets中的bundles
+        var bundlesText = Resources.Load<TextAsset>("bundles").text;
+        var builtInBundles = new Dictionary<string, BundleInfo>();
+        foreach (string line in bundlesText.Split('\n'))
+        {
+            var bundle = JsonUtility.FromJson<BundleInfo>(line);
+            bundle.path = Application.streamingAssetsPath + "/" + bundle.fileName();
+            builtInBundles[bundle.name] = bundle;
+        }
 
         foreach (var remote in remotes)
         {
-            yield return DownloadBundle(remote);
+            BundleInfo builtInBundle;
+            if (builtInBundles.TryGetValue(remote.name, out builtInBundle) &&
+                builtInBundle.checksum == remote.checksum)
+            {
+                _bundleInfos[builtInBundle.name] = builtInBundle;
+            }
+            else
+            {
+                // 下载缺失的AssetBundles
+                yield return DownloadBundle(remote);
+            }
         }
-
         _done = true;
         Debug.Log("All Bundles are downloaded.");
     }
@@ -164,6 +192,7 @@ public class Bundles : AssetLoader
             if (crc32 == info.checksum)
             {
                 tmpFile.MoveTo(localFile.FullName);
+                info.path = localFile.FullName;
                 _bundleInfos[info.name] = info;
                 Debug.Log("Download Bundle:" + info.name + " ok");
             }
@@ -244,7 +273,8 @@ public class Bundles : AssetLoader
         var bundleName = prefabName.ToLower() + ".ab";
         bundle = Get(bundleName);
         if (bundle == null) return null;
-        var prefab = bundle.LoadAsset<GameObject>(prefabName.Substring(prefabName.LastIndexOf("/") + 1));
+        var assetName = prefabName.Substring(prefabName.LastIndexOf("/") + 1);
+        var prefab = bundle.LoadAsset<GameObject>(assetName);
         return prefab;
     }
 
@@ -286,6 +316,8 @@ class BundleInfo
     public string name;
 
     public string checksum;
+
+    public string path;
 
     public string fileName()
     {
