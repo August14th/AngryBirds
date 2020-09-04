@@ -1,4 +1,3 @@
-
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -29,17 +28,17 @@ public abstract class AssetLoader : MonoBehaviour
     public abstract void SetSprite(Image image, string atlasPath, string spriteName);
 
     public abstract bool IsDone();
-    
+
     private readonly Dictionary<Object, HashSet<Object>> _ins = new Dictionary<Object, HashSet<Object>>();
 
-    private readonly Dictionary<Object, HashSet<Object>>_outs = new Dictionary<Object, HashSet<Object>>();
+    private readonly Dictionary<Object, HashSet<Object>> _outs = new Dictionary<Object, HashSet<Object>>();
 
 
     protected void AddRef(Object go, Object dependOn)
     {
         Assert.IsTrue(go != null);
         Assert.IsTrue(dependOn != null);
-        
+
         if (!_ins.ContainsKey(dependOn))
         {
             _ins[dependOn] = new HashSet<Object>();
@@ -58,10 +57,8 @@ public abstract class AssetLoader : MonoBehaviour
 
     protected void RemoveRef(Object go)
     {
-        if (_ins.Remove(go))
-        {
-            Unload(go);
-        }
+        Unload(go);
+        _ins.Remove(go);
 
         HashSet<Object> outs;
         if (_outs.TryGetValue(go, out outs))
@@ -74,6 +71,6 @@ public abstract class AssetLoader : MonoBehaviour
             }
         }
     }
-    
+
     protected abstract void Unload(Object asset);
 }

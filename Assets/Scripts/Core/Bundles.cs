@@ -82,7 +82,7 @@ public class Bundles : AssetLoader
         var bundle = AssetBundle.LoadFromFile(info.path);
         Debug.Log("Load asset bundle:" + bundleName);
         _bundles[bundleName] = bundle;
-
+        
         var dependencies = GetDependencies(bundleName);
         foreach (var dependency in dependencies)
         {
@@ -98,85 +98,111 @@ public class Bundles : AssetLoader
         return manifest.GetDirectDependencies(bundle);
     }
 
+    private Dictionary<string, BundleInfo> GetLocalBundles()
+    {
+        // 存在于persistentDataPath的bundles
+        var localFolder = new DirectoryInfo(LocalPath);
+        if (!localFolder.Exists) localFolder.Create();
+        var localFiles = localFolder.GetFiles("*", SearchOption.AllDirectories).ToList();
+        var locals = new Dictionary<string, BundleInfo>();
+        foreach (var file in localFiles)
+        {
+            var relativePath = file.FullName.Substring(LocalPath.Length + 1);
+            relativePath = relativePath.Replace(Path.DirectorySeparatorChar.ToString(), "/");
+            string name, checksum;
+            Parse(relativePath, out name, out checksum);
+            var bundle = new BundleInfo
+            {
+                name = name, checksum = checksum
+            };
+            bundle.path = file.FullName;
+            locals[bundle.name] = bundle;
+        }
 
+        // 存在于streamingAssets中的bundles
+        var bundlesText = Resources.Load<TextAsset>("bundles").text;
+        foreach (string json in bundlesText.Split('\n'))
+        {
+            var bundle = JsonUtility.FromJson<BundleInfo>(json);
+            bundle.path = Application.streamingAssetsPath + "/" + bundle.fileName();
+            bundle.builtin = true;
+            if (!locals.ContainsKey(bundle.name))
+            {
+                locals[bundle.name] = bundle;
+            }
+        }
+
+        return locals;
+    }
+    
     private IEnumerator DownloadBundles()
     {
+        var locals = GetLocalBundles();
+        
         var request = UnityWebRequest.Get(_bundleUri + "bundles.txt");
         yield return request.SendWebRequest();
 
         if (request.isNetworkError || request.isHttpError)
         {
             Debug.LogError("Download bundles.txt failed:" + request.error);
+            request.Dispose();
+            foreach (var bundle in locals)
+            {
+                _bundleInfos[bundle.Key] = bundle.Value;
+            }
+            _done = true;
             yield break;
         }
-
         var text = request.downloadHandler.text;
-
         request.Dispose();
-        var jsonList = new HashSet<string>(text.Split('\n').ToList());
+        //  最新的bundles列表
+        var bundlesTxt = new HashSet<string>(text.Split('\n').ToList());
         var remotes = new List<BundleInfo>();
-        foreach (var json in jsonList)
+        foreach (var json in bundlesTxt)
         {
             var bundleInfo = JsonUtility.FromJson<BundleInfo>(json);
             remotes.Add(bundleInfo);
         }
-        // 本地的已经有的bundles
-        var localFolder = new DirectoryInfo(LocalPath);
-        if (!localFolder.Exists) localFolder.Create();
-        var locals = localFolder.GetFiles("*", SearchOption.AllDirectories).ToList();
-
-        for (int i = locals.Count - 1; i >= 0; i--)
-        {
-            var relativePath = locals[i].FullName.Substring(LocalPath.Length + 1);
-            var file = relativePath.Replace(Path.DirectorySeparatorChar.ToString(), "/");
-            var found = remotes.Find(b => b.fileName() == file);
-            if (found != null)
-            {
-                found.path = locals[i].FullName;
-                locals.RemoveAt(i);
-                remotes.Remove(found);
-                _bundleInfos[found.name] = found;
-            }
-        }
-
-        // 删除已经过期的bundles
-        locals.ForEach(d => d.Delete());
-        // 存在于streamingAssets中的bundles
-        var bundlesText = Resources.Load<TextAsset>("bundles").text;
-        var builtInBundles = new Dictionary<string, BundleInfo>();
-        foreach (string line in bundlesText.Split('\n'))
-        {
-            var bundle = JsonUtility.FromJson<BundleInfo>(line);
-            bundle.path = Application.streamingAssetsPath + "/" + bundle.fileName();
-            builtInBundles[bundle.name] = bundle;
-        }
-
+        // 计算本地和最新的差异，删除过期的，下载缺失的
         foreach (var remote in remotes)
         {
-            BundleInfo builtInBundle;
-            if (builtInBundles.TryGetValue(remote.name, out builtInBundle) &&
-                builtInBundle.checksum == remote.checksum)
+            BundleInfo bundle;
+            if (locals.TryGetValue(remote.name, out bundle) &&
+                bundle.checksum == remote.checksum)
             {
-                _bundleInfos[builtInBundle.name] = builtInBundle;
+                _bundleInfos[bundle.name] = bundle;
+                locals.Remove(remote.name);
             }
             else
             {
-                // 下载缺失的AssetBundles
                 yield return DownloadBundle(remote);
             }
         }
+
+        foreach (var bundle in locals.Values)
+        {
+            if (!bundle.builtin) File.Delete(bundle.path);
+        }
+
         _done = true;
         Debug.Log("All Bundles are downloaded.");
     }
-
-    private IEnumerator DownloadBundle(BundleInfo info)
+    
+    private void Parse(string file, out string bundle, out string crc32)
     {
-        var localFile = new FileInfo(Path.Combine(LocalPath, info.fileName()));
+        var sep = file.LastIndexOf('.');
+        bundle = file.Substring(0, sep);
+        crc32 = file.Substring(sep + 1);
+    }
+
+    private IEnumerator DownloadBundle(BundleInfo bundle)
+    {
+        var localFile = new FileInfo(Path.Combine(LocalPath, bundle.fileName()));
         if (localFile.Exists) localFile.Delete();
         var folder = localFile.Directory;
         if (folder != null && !folder.Exists) folder.Create();
 
-        var request = UnityWebRequest.Get(_bundleUri + info.fileName());
+        var request = UnityWebRequest.Get(_bundleUri + bundle.fileName());
         var tmpFile = new FileInfo(localFile.FullName + ".tmp");
         request.downloadHandler = new DownloadHandlerFile(tmpFile.FullName);
         yield return request.SendWebRequest();
@@ -184,17 +210,17 @@ public class Bundles : AssetLoader
         if (request.isNetworkError || request.isHttpError)
         {
             if (tmpFile.Exists) tmpFile.Delete();
-            Debug.LogError("Download Bundle:" + info.fileName() + " failed:" + request.error);
+            Debug.LogError("Download Bundle:" + bundle.fileName() + " failed:" + request.error);
         }
         else
         {
             var crc32 = CRC32.GetCRC32(File.ReadAllBytes(tmpFile.FullName)).ToString("X").ToLower();
-            if (crc32 == info.checksum)
+            if (crc32 == bundle.checksum)
             {
                 tmpFile.MoveTo(localFile.FullName);
-                info.path = localFile.FullName;
-                _bundleInfos[info.name] = info;
-                Debug.Log("Download Bundle:" + info.name + " ok");
+                bundle.path = localFile.FullName;
+                _bundleInfos[bundle.name] = bundle;
+                Debug.Log("Download Bundle:" + bundle.name + " ok");
             }
             else tmpFile.Delete();
 
@@ -307,17 +333,14 @@ public class Bundles : AssetLoader
 
 class BundleInfo
 {
-    public BundleInfo(string name, string checksum)
-    {
-        this.name = name;
-        this.checksum = checksum;
-    }
 
     public string name;
 
     public string checksum;
 
     public string path;
+
+    public bool builtin;
 
     public string fileName()
     {
