@@ -13,10 +13,14 @@
 
 #截图
 
-1. ![下载资源](https://github.com/August14th/AngryBirds/tree/master/Pictures/download.png)
-2. ![关卡选择](https://github.com/August14th/AngryBirds/tree/master/Pictures/level.png)
-3. ![飞行中的小鸟](https://github.com/August14th/AngryBirds/tree/master/Pictures/bird.png)
-4. ![胜利](https://github.com/August14th/AngryBirds/tree/master/Pictures/settle.png)
+1. 下载资源 
+![下载资源](https://raw.githubusercontent.com/August14th/AngryBirds/master/Pictures/download.png)
+2. 关卡选择
+![关卡选择](https://raw.githubusercontent.com/August14th/AngryBirds/master/Pictures/level.png)
+3. 飞行中的小鸟
+![飞行中的小鸟](https://raw.githubusercontent.com/August14th/AngryBirds/master/Pictures/bird.png)
+4. 胜利
+![胜利](https://raw.githubusercontent.com/August14th/AngryBirds/master/Pictures/settle.png)
 
 # 参考资源
 
