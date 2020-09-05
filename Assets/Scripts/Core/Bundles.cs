@@ -11,15 +11,17 @@ using Object = UnityEngine.Object;
 
 public class Bundles : AssetLoader
 {
-    #if UNITY_ANDROID
+    public Text Text;
+
+#if UNITY_ANDROID
     private string platform = "android";
-    #endif
-    #if UNITY_IPHONE
+#endif
+#if UNITY_IPHONE
         private string platform = "ios";
-    #endif
-    #if UNITY_STANDALONE_WIN
+#endif
+#if UNITY_STANDALONE_WIN
         private string platform = "windows";
-    #endif
+#endif
     private string _bundleUri;
 
     private readonly Dictionary<string, AssetBundle> _bundles = new Dictionary<string, AssetBundle>();
@@ -30,8 +32,13 @@ public class Bundles : AssetLoader
     {
         get { return Path.Combine(Application.persistentDataPath, "Bundles"); }
     }
-
+    
     private bool _done;
+
+    private void Awake()
+    {
+        Text = GameObject.Find("DlText").GetComponent<Text>();
+    }
 
     public void StartDownloads(string bundlesPath)
     {
@@ -62,7 +69,7 @@ public class Bundles : AssetLoader
             }
         }
     }
-    
+
     private AssetBundle Get(string bundleName)
     {
         if (!_bundles.ContainsKey(bundleName))
@@ -82,7 +89,7 @@ public class Bundles : AssetLoader
         var bundle = AssetBundle.LoadFromFile(info.path);
         Debug.Log("Load asset bundle:" + bundleName);
         _bundles[bundleName] = bundle;
-        
+
         var dependencies = GetDependencies(bundleName);
         foreach (var dependency in dependencies)
         {
@@ -134,11 +141,12 @@ public class Bundles : AssetLoader
 
         return locals;
     }
-    
+
     private IEnumerator DownloadBundles()
     {
+        Text.text = "正在连接资源服务器...";
         var locals = GetLocalBundles();
-        
+
         var request = UnityWebRequest.Get(_bundleUri + "bundles.txt");
         yield return request.SendWebRequest();
 
@@ -150,9 +158,12 @@ public class Bundles : AssetLoader
             {
                 _bundleInfos[bundle.Key] = bundle.Value;
             }
+
             _done = true;
+            Text.text = "网络异常，使用本地资源。";
             yield break;
         }
+
         var text = request.downloadHandler.text;
         request.Dispose();
         //  最新的bundles列表
@@ -163,7 +174,9 @@ public class Bundles : AssetLoader
             var bundleInfo = JsonUtility.FromJson<BundleInfo>(json);
             remotes.Add(bundleInfo);
         }
+
         // 计算本地和最新的差异，删除过期的，下载缺失的
+        var updateBundles = new List<BundleInfo>();
         foreach (var remote in remotes)
         {
             BundleInfo bundle;
@@ -175,19 +188,29 @@ public class Bundles : AssetLoader
             }
             else
             {
-                yield return DownloadBundle(remote);
+                updateBundles.Add(remote);
             }
         }
-
+        
         foreach (var bundle in locals.Values)
         {
             if (!bundle.builtin) File.Delete(bundle.path);
         }
 
+        var notice = "正在下载资源...";
+        var total = updateBundles.Count;
+        var current = 0;
+        foreach (var bundle in updateBundles)
+        {
+            yield return DownloadBundle(bundle);
+            Text.text = notice + ++current + "/" + total;
+            yield return new WaitForSeconds(0.1f);
+        }
+        
         _done = true;
         Debug.Log("All Bundles are downloaded.");
     }
-    
+
     private void Parse(string file, out string bundle, out string crc32)
     {
         var sep = file.LastIndexOf('.');
@@ -223,7 +246,6 @@ public class Bundles : AssetLoader
                 Debug.Log("Download Bundle:" + bundle.name + " ok");
             }
             else tmpFile.Delete();
-
         }
 
         request.Dispose();
@@ -328,12 +350,10 @@ public class Bundles : AssetLoader
     {
         return _done;
     }
-
 }
 
 class BundleInfo
 {
-
     public string name;
 
     public string checksum;
