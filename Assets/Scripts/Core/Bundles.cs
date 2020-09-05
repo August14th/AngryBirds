@@ -148,6 +148,7 @@ public class Bundles : AssetLoader
         var locals = GetLocalBundles();
 
         var request = UnityWebRequest.Get(_bundleUri + "bundles.txt");
+        request.timeout = 3;
         yield return request.SendWebRequest();
 
         if (request.isNetworkError || request.isHttpError)
@@ -161,6 +162,7 @@ public class Bundles : AssetLoader
 
             _done = true;
             Text.text = "网络异常，使用本地资源。";
+            yield return new WaitForSeconds(2f);
             yield break;
         }
 
