@@ -314,7 +314,7 @@ public class Bundles : AssetLoader
             {
                 if (sprite.name == spriteName)
                 {
-                    AddRef(bundle, image.gameObject);
+                    AddRef(image.gameObject, bundle);
                     var t = image.gameObject.AddComponent<DestroyCallback>();
                     t.Callback = () => RemoveRef(t.gameObject);
                     image.sprite = sprite;

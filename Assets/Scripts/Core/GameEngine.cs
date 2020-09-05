@@ -25,8 +25,8 @@ public class GameEngine : MonoBehaviour
 			yield return null;
 		}
 
-		_luaState = gameObject.AddComponent<LuaState>();
 		_scenes = gameObject.AddComponent<Scenes>();
+		_luaState = gameObject.AddComponent<LuaState>();
 
 		_scenes.GotoScene("Main");
 	}

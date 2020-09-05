@@ -29,6 +29,7 @@ public class LuaState : GameBehaviour
 		luaEnv.DoString("G_index = require 'extends.index'");
 		luaEnv.DoString("G_newindex = require 'extends.newindex'");
 		luaEnv.DoString("require 'extends.extends'");
+		luaEnv.DoString("require 'core.global'");
 		LuaEnv = luaEnv;
 	}
 

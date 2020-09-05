@@ -1,6 +1,6 @@
 local index = require("extends.index")
 local newindex = require("extends.newindex")
-local list = require("list")
+local list = require("core.list")
 
 local keys = list()
 for key, _ in pairs(index) do

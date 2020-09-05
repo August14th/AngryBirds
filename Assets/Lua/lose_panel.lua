@@ -1,17 +1,13 @@
-local base = require "base"
-local class = require "class"
+local class = require "core.class"
 
-local _M = class({prefab_name = "prefab/LosePanel"}, base)
+local _M = class({})
 
-function _M:ctor()
-    local assets = self:Assets()
-    local canvas = self:Canvas()
-    local scenes = self:Scenes()
-    local panel = assets:NewUI(self.prefab_name, canvas.transform)
-    panel:child("Home").Button.click = function()
+function _M:ctor(go)
+    local homeBtn = go:child("Home").Button
+    homeBtn.click = function()
         scenes:GotoScene("Main")
     end
-    return {panel = panel}
+    return {go = go}
 end
 
 return _M
