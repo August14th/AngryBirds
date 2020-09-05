@@ -11,16 +11,16 @@
 7. 通过扩展GameObject的__index和__newindex，支持在lua代码中直接访问GameObject上挂载的C#组件，例如go.Image就可以访问Image组件。button.onclick = function()...end可以注册点击函数。
 简化lua代码。
 
-#截图
+# 截图
 
 1. 下载资源 
-![下载资源](https://raw.githubusercontent.com/August14th/AngryBirds/master/Pictures/download.png)
+![下载资源](https://raw.githubusercontent.com/August14th/AngryBirds/master/Pictures/download.jpg)
 2. 关卡选择
-![关卡选择](https://raw.githubusercontent.com/August14th/AngryBirds/master/Pictures/level.png)
+![关卡选择](https://raw.githubusercontent.com/August14th/AngryBirds/master/Pictures/level.jpg)
 3. 飞行中的小鸟
-![飞行中的小鸟](https://raw.githubusercontent.com/August14th/AngryBirds/master/Pictures/bird.png)
+![飞行中的小鸟](https://raw.githubusercontent.com/August14th/AngryBirds/master/Pictures/bird.jpg)
 4. 胜利
-![胜利](https://raw.githubusercontent.com/August14th/AngryBirds/master/Pictures/settle.png)
+![胜利](https://raw.githubusercontent.com/August14th/AngryBirds/master/Pictures/settle.jpg)
 
 # 参考资源
 
