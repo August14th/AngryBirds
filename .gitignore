@@ -12,3 +12,8 @@ bundles.txt
 Assets/Target/
 Assets/Lua/test.lua
 Publish/
+Build/
+Package/
+NetBox2.exe
+index.html
+Assets/StreamingAssets

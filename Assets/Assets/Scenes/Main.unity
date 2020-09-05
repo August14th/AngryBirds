@@ -260,8 +260,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 38.7, y: -17.6}
-  m_SizeDelta: {x: 1077.3, y: 516.6}
+  m_AnchoredPosition: {x: 22.1, y: -17.6}
+  m_SizeDelta: {x: 1388.6, y: 516.6}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &231200034
 MonoBehaviour:
@@ -283,7 +283,7 @@ MonoBehaviour:
   m_StartCorner: 0
   m_StartAxis: 0
   m_CellSize: {x: 200, y: 500}
-  m_Spacing: {x: 80, y: 0}
+  m_Spacing: {x: 100, y: 0}
   m_Constraint: 0
   m_ConstraintCount: 2
 --- !u!114 &231200035
@@ -357,7 +357,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 2
-  m_Size: {x: 8.5, y: 3}
+  m_Size: {x: 12, y: 3}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -369,7 +369,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 241780578}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.008, y: 1.31, z: 0}
+  m_LocalPosition: {x: -0.025, y: 1.31, z: 0}
   m_LocalScale: {x: 2, y: 2.5, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -660,7 +660,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 2
-  m_Size: {x: 13, y: 2}
+  m_Size: {x: 18.5, y: 2}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -920,6 +920,11 @@ Prefab:
       value: 
       objectReference: {fileID: 1258214927711148, guid: eb14bd29eac5df54c8cd9cc31264c4b8,
         type: 2}
+    - target: {fileID: 224796663154999974, guid: b1d62c3436cab7646935214929e3830b,
+        type: 2}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: b1d62c3436cab7646935214929e3830b, type: 2}
   m_IsPrefabParent: 0
