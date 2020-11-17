@@ -4,7 +4,6 @@ Library/
 .idea/
 Temp/
 obj/
-*.meta
 Assets/Scripts/GenCode/
 Bundles/
 bundles.txt
