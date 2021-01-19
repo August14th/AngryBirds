@@ -11,14 +11,18 @@ public class GameEngine : MonoBehaviour
 
 	private Scenes _scenes;
 
+	private PlatformClient _client;
+
 	private IEnumerator Start()
 	{
 #if UNITY_EDITOR
 		_assetLoader = gameObject.AddComponent<LocalAsset>();
-#else
+		_client = gameObject.AddComponent<EditorClient>();
+#elif UNITY_ANDROID
 		var bundles = gameObject.AddComponent<Bundles>();
 		bundles.StartDownloads(BundlesUri);
 		_assetLoader = bundles;
+		_client = gameObject.AddComponent<AndroidClient>(); 
 #endif
 		while (!_assetLoader.IsDone())
 		{
@@ -45,5 +49,10 @@ public class GameEngine : MonoBehaviour
 	public Scenes Scenes
 	{
 		get { return _scenes; }
+	}
+
+	public PlatformClient Client
+	{
+		get { return _client; }
 	}
 }

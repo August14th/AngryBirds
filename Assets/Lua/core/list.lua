@@ -7,7 +7,7 @@ function list:filter(f)
     local found = list()
     self:foreach(function(value) 
         if f(value) then
-            found:add(vlaue)
+            found:add(value)
         end
     end)
     return found

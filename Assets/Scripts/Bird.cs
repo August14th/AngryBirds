@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -10,12 +9,12 @@ public class Bird : GameBehaviour
     public GameManger GameManger;
 
     protected Rigidbody2D RigidBody;
-    
+
     private List<AudioSource> _audios;
 
     private TrailRenderer _trailRenderer;
 
-    private int _state;
+    public bool IsFlying { private set; get; }
 
     private void Start()
     {
@@ -29,7 +28,7 @@ public class Bird : GameBehaviour
     private void OnMouseDrag()
     {
         if (IsBehindGUI()) return;
-        if (_state != 1) return;
+        if (IsFlying) return;
         Vector2 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         GameManger.DragBird(this, pos);
     }
@@ -37,23 +36,14 @@ public class Bird : GameBehaviour
     private void OnMouseUp()
     {
         if (IsBehindGUI()) return;
-        if (_state != 1) return;
-        _trailRenderer.enabled = true;
+        if (IsFlying) return;
         GameManger.ThrowBird(this);
-        _state = 2;
     }
 
-    private void FixedUpdate()
-    {
-        if (_state == 2 && RigidBody.velocity.magnitude < 0.05f)
-        {
-            StartCoroutine(DestroyAfter(0.5f));
-        }
-    }
 
     private void Update()
     {
-        if (IsFlying())
+        if (IsFlying)
         {
             if (Input.GetMouseButtonDown(0) && !IsBehindGUI())
             {
@@ -62,32 +52,28 @@ public class Bird : GameBehaviour
         }
     }
 
-    public void PutOnSlingShot(SlingShot slingShot)
+    public Vector2 Speed
     {
-        _state = 1;
-        slingShot.Take(this);
+        private get { return RigidBody.velocity; }
+        set { RigidBody.velocity = value; }
     }
 
-    IEnumerator DestroyAfter(float seconds)
+    public void Fly(Vector2 speed)
     {
-        yield return new WaitForSeconds(seconds);
-        Destroy(gameObject);
-    }
-
-    public void SetSpeed(Vector2 speed)
-    {
+        Speed = speed;
+        IsFlying = true;
+        _trailRenderer.enabled = true;
         RigidBody.isKinematic = false;
-        RigidBody.velocity = speed;
-    }
-    
-    public void MoveTo(Vector2 dest)
-    {
-        transform.position = dest;
+        StartCoroutine(DestroyIfStop());
+
     }
 
-    public void MoveTo(Vector2 dest, Action onCompleted)
+    private IEnumerator DestroyIfStop()
     {
-        transform.positionTo(.1f, dest).setOnCompleteHandler(x => onCompleted());
+        while (Speed.magnitude > 0.05f)
+            yield return null;
+        yield return new WaitForSeconds(0.5f);
+        Destroy(gameObject);
     }
 
     public void PlaySound(int idx)
@@ -96,13 +82,8 @@ public class Bird : GameBehaviour
         _audios[idx].enabled = true;
     }
 
-    public bool IsFlying()
-    {
-        return _state == 2;
-    }
-
     protected virtual void CastSkill()
     {
-        
+
     }
 }

@@ -16,8 +16,6 @@ public class GameManger : GameBehaviour
 
     private string WinPanel = "Prefab/WinPanel";
 
-    private State _state;
-
     private int _birdIndex = -1;
 
     private CameraMove _cameraMove;
@@ -25,6 +23,8 @@ public class GameManger : GameBehaviour
     private CameraFollow _cameraFollow;
 
     public String Level;
+
+    private bool _playing;
 
     // Use this for initialization
     void Start()
@@ -35,19 +35,10 @@ public class GameManger : GameBehaviour
 
     private void Update()
     {
-        switch (_state)
+        if (!_playing && Input.GetMouseButtonDown(0) && !IsBehindGUI())
         {
-            case State.Idle:
-                if (Input.GetMouseButtonDown(0) && !IsBehindGUI()) TakeNextBird();
-                break;
-            case State.Flying:
-                if (BricksBirdsPigsStoppedMoving())
-                {
-                    if (!IsOver()) TakeNextBird();
-                    else Settle();
-                }
-
-                break;
+            _playing = true;
+            TakeNextBird();
         }
     }
 
@@ -57,11 +48,9 @@ public class GameManger : GameBehaviour
         var bird = Birds[_birdIndex];
         _cameraFollow.MoveToStartPos(() =>
         {
-            bird.PutOnSlingShot(SlingShot);
+            SlingShot.Take(bird);
             _cameraMove.enabled = true;
-            _state = State.Waiting;
         });
-        _state = State.Taking;
     }
 
     public void DragBird(Bird bird, Vector2 newPos)
@@ -69,24 +58,34 @@ public class GameManger : GameBehaviour
         if (bird != Birds[_birdIndex]) return;
         if (_cameraMove.enabled) _cameraMove.enabled = false;
         SlingShot.DragBird(newPos);
-        _state = State.Pulling;
     }
 
     public void ThrowBird(Bird bird)
     {
-        if (bird != Birds[_birdIndex]) return;
+        StartCoroutine(DoThrowBird(bird));
+    }
+
+    private IEnumerator DoThrowBird(Bird bird)
+    {
+        if (bird != Birds[_birdIndex]) yield break;
         if (_cameraMove.enabled) _cameraMove.enabled = false;
         _cameraFollow.StartFollow(bird.gameObject);
         SlingShot.ThrowBird();
-        _state = State.Flying;
+        while (!AllStopMoving())
+        {
+            yield return null;
+        }
+
+        if (!IsOver()) TakeNextBird();
+        else Settle();
     }
 
-    private bool BricksBirdsPigsStoppedMoving()
+    private bool AllStopMoving()
     {
         foreach (var bird in Birds)
         {
             // 判断是不是已经被destroy了
-            if (bird && bird.IsFlying()) return false;
+            if (bird && bird.IsFlying) return false;
         }
 
         foreach (var pig in Pigs)
@@ -99,7 +98,6 @@ public class GameManger : GameBehaviour
 
     private void Settle()
     {
-        _state = State.Over;
         var isWin = Pigs.Count(b => b) == 0;
         if (isWin)
         {

@@ -20,7 +20,7 @@ public abstract class AssetLoader : MonoBehaviour
     public abstract GameObject NewActor(string prefabName, Vector3 position);
 
     public abstract GameObject NewUI(string prefabName, Transform parent);
-
+    
     public abstract void LoadScene(string sceneName);
 
     public abstract byte[] Require(ref string filepath);
@@ -55,10 +55,17 @@ public abstract class AssetLoader : MonoBehaviour
     }
 
 
-    protected void RemoveRef(Object go)
+    protected void TryUnload(Object go)
     {
-        Unload(go);
-        _ins.Remove(go);
+        HashSet<Object> ins;
+        if (_ins.TryGetValue(go, out ins))
+        {
+            if (ins.Count == 0)
+            {
+                _ins.Remove(go);
+                Unload(go);
+            } else return;
+        }
 
         HashSet<Object> outs;
         if (_outs.TryGetValue(go, out outs))
@@ -67,7 +74,7 @@ public abstract class AssetLoader : MonoBehaviour
             foreach (var @out in outs)
             {
                 _ins[@out].Remove(go);
-                if (_ins[@out].Count == 0) RemoveRef(@out);
+                TryUnload(@out);
             }
         }
     }

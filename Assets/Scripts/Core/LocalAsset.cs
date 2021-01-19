@@ -1,6 +1,4 @@
 ﻿#if UNITY_EDITOR
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
@@ -17,10 +15,7 @@ public class LocalAsset : AssetLoader
     {
         var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath(prefabName));
         var actor = Instantiate(prefab, position, Quaternion.identity);
-        var t = actor.AddComponent<DestroyCallback>();
-        t.Callback = () => RemoveRef(t.gameObject);
 
-        AddRef(actor, prefab);
         return actor;
     }
 
@@ -28,10 +23,7 @@ public class LocalAsset : AssetLoader
     {
         var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath(prefabName));
         var ui = Instantiate(prefab, parent, false);
-        var t = ui.AddComponent<DestroyCallback>();
-        t.Callback = () => RemoveRef(t.gameObject);
 
-        AddRef(ui, prefab);
         return ui;
     }
 
@@ -67,7 +59,7 @@ public class LocalAsset : AssetLoader
 
     protected override void Unload(Object asset)
     {
-        Resources.UnloadUnusedAssets();
+
     }
 
     public override bool IsDone()

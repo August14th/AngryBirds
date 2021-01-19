@@ -32,7 +32,7 @@ public class Bundles : AssetLoader
     {
         get { return Path.Combine(Application.persistentDataPath, "Bundles"); }
     }
-    
+
     private bool _done;
 
     private void Awake()
@@ -43,13 +43,13 @@ public class Bundles : AssetLoader
     public void StartDownloads(string bundlesPath)
     {
         _bundleUri = bundlesPath + platform + "/";
-        StartCoroutine(DownloadBundles());
+        StartCoroutine(UpdateBundles());
     }
 
     private void RemoveBundle(string bundleName)
     {
         AssetBundle bundle;
-        if (_bundles.TryGetValue(bundleName, out bundle)) RemoveRef(bundle);
+        if (_bundles.TryGetValue(bundleName, out bundle)) TryUnload(bundle);
     }
 
     protected override void Unload(Object asset)
@@ -120,29 +120,28 @@ public class Bundles : AssetLoader
             Parse(relativePath, out name, out checksum);
             var bundle = new BundleInfo
             {
-                name = name, checksum = checksum
+                name = name, checksum = checksum, path = file.FullName
             };
-            bundle.path = file.FullName;
             locals[bundle.name] = bundle;
         }
 
         // 存在于streamingAssets中的bundles
         var bundlesText = Resources.Load<TextAsset>("bundles").text;
-        foreach (string json in bundlesText.Split('\n'))
+        foreach (var json in bundlesText.Split('\n'))
         {
-            var bundle = JsonUtility.FromJson<BundleInfo>(json);
-            bundle.path = Application.streamingAssetsPath + "/" + bundle.fileName();
-            bundle.builtin = true;
-            if (!locals.ContainsKey(bundle.name))
+            var bundleInfo = JsonUtility.FromJson<BundleInfo>(json);
+            bundleInfo.path = Application.streamingAssetsPath + "/" + bundleInfo.fileName();
+            bundleInfo.builtin = true;
+            if (!locals.ContainsKey(bundleInfo.name))
             {
-                locals[bundle.name] = bundle;
+                locals[bundleInfo.name] = bundleInfo;
             }
         }
 
         return locals;
     }
 
-    private IEnumerator DownloadBundles()
+    private IEnumerator UpdateBundles()
     {
         Text.text = "正在连接资源服务器...";
         var locals = GetLocalBundles();
@@ -169,16 +168,15 @@ public class Bundles : AssetLoader
         var text = request.downloadHandler.text;
         request.Dispose();
         //  最新的bundles列表
-        var bundlesTxt = new HashSet<string>(text.Split('\n').ToList());
         var remotes = new List<BundleInfo>();
-        foreach (var json in bundlesTxt)
+        foreach (var json in text.Split('\n'))
         {
             var bundleInfo = JsonUtility.FromJson<BundleInfo>(json);
             remotes.Add(bundleInfo);
         }
 
         // 计算本地和最新的差异，删除过期的，下载缺失的
-        var updateBundles = new List<BundleInfo>();
+        var misses = new List<BundleInfo>();
         foreach (var remote in remotes)
         {
             BundleInfo bundle;
@@ -190,25 +188,25 @@ public class Bundles : AssetLoader
             }
             else
             {
-                updateBundles.Add(remote);
+                misses.Add(remote);
             }
         }
-        
+
         foreach (var bundle in locals.Values)
         {
             if (!bundle.builtin) File.Delete(bundle.path);
         }
 
         var notice = "正在下载资源...";
-        var total = updateBundles.Count;
+        var total = misses.Count;
         var current = 0;
-        foreach (var bundle in updateBundles)
+        foreach (var bundle in misses)
         {
             yield return DownloadBundle(bundle);
             Text.text = notice + ++current + "/" + total;
             yield return new WaitForSeconds(0.1f);
         }
-        
+
         _done = true;
         Debug.Log("All Bundles are downloaded.");
     }
@@ -235,22 +233,24 @@ public class Bundles : AssetLoader
         if (request.isNetworkError || request.isHttpError)
         {
             if (tmpFile.Exists) tmpFile.Delete();
-            Debug.LogError("Download Bundle:" + bundle.fileName() + " failed:" + request.error);
+            throw new Exception("Download Bundle:" + bundle.fileName() + " failed:" + request.error);
+        }
+        request.Dispose();
+        
+        var crc32 = CRC32.GetCRC32(File.ReadAllBytes(tmpFile.FullName)).ToString("X").ToLower();
+        if (crc32 == bundle.checksum)
+        {
+            tmpFile.MoveTo(localFile.FullName);
+            bundle.path = localFile.FullName;
+            _bundleInfos[bundle.name] = bundle;
+            Debug.Log("Download Bundle:" + bundle.name + " ok");
         }
         else
         {
-            var crc32 = CRC32.GetCRC32(File.ReadAllBytes(tmpFile.FullName)).ToString("X").ToLower();
-            if (crc32 == bundle.checksum)
-            {
-                tmpFile.MoveTo(localFile.FullName);
-                bundle.path = localFile.FullName;
-                _bundleInfos[bundle.name] = bundle;
-                Debug.Log("Download Bundle:" + bundle.name + " ok");
-            }
-            else tmpFile.Delete();
+            tmpFile.Delete();
+            throw new Exception("Checksum Bundle:" + bundle.fileName() + " failed, expected: " +
+                                bundle.checksum + ", but got:" + crc32);
         }
-
-        request.Dispose();
     }
 
     public override byte[] Require(ref string file)
@@ -277,7 +277,7 @@ public class Bundles : AssetLoader
             var actor = Instantiate(prefab, position, Quaternion.identity);
 
             var t = actor.AddComponent<DestroyCallback>();
-            t.Callback = () => RemoveRef(t.gameObject);
+            t.Callback = () => TryUnload(t.gameObject);
 
             AddRef(actor, bundle);
             return actor;
@@ -296,7 +296,7 @@ public class Bundles : AssetLoader
             var ui = Instantiate(prefab, parent.transform, false);
 
             var t = ui.AddComponent<DestroyCallback>();
-            t.Callback = () => RemoveRef(t.gameObject);
+            t.Callback = () => TryUnload(t.gameObject);
             AddRef(ui, bundle);
             return ui;
         }
@@ -340,7 +340,7 @@ public class Bundles : AssetLoader
                 {
                     AddRef(image.gameObject, bundle);
                     var t = image.gameObject.AddComponent<DestroyCallback>();
-                    t.Callback = () => RemoveRef(t.gameObject);
+                    t.Callback = () => TryUnload(t.gameObject);
                     image.sprite = sprite;
                     break;
                 }
