@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class AndroidClient : PlatformClient
 {
@@ -15,9 +13,9 @@ public class AndroidClient : PlatformClient
         _mainActivity = _unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
     }
 
-    public override int Add(int i, int j)
+    public override void Login()
     {
-        return _mainActivity.Call<int>("Add", i, j);
+        _mainActivity.Call("login");
     }
 
     private void OnDestroy()

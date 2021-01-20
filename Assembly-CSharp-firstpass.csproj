@@ -311,6 +311,9 @@
     <Reference Include="UnityEngine.StandardEvents">
       <HintPath>C:/Users/yuhel/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.standardevents@1.0.10/UnityEngine.StandardEvents.dll</HintPath>
     </Reference>
+    <Reference Include="LitJSON">
+      <HintPath>D:/Projects/AngryBirds/Assets/Plugins/LitJSON.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class PlatformClient : MonoBehaviour
+public abstract class PlatformClient : GameBehaviour
 {
 
-    public abstract int Add(int i, int j);
+    public abstract void Login();
 
 }

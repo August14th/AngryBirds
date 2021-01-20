@@ -23,27 +23,37 @@ public class GameBehaviour : MonoBehaviour
 		get { return GetEngine().Assets; }
 	}
 
-	public static GameObject Canvas
+	protected static Player Player
+	{
+		get { return GetEngine().Player; }
+	}
+
+	protected static Servlet Servlet
+	{
+		get { return GetEngine().Servlet; }
+	}
+
+	protected static GameObject Canvas
 	{
 		get { return GameObject.Find("Canvas"); }
 	}
 
-	public static LuaState LuaState
+	protected static LuaState LuaState
 	{
 		get { return GetEngine().LuaState; }
 	}
 
-	public static Scenes Scenes
+	protected static Scenes Scenes
 	{
 		get { return GetEngine().Scenes; }
 	}
 
-	public static bool IsBehindGUI()
+	protected static bool IsBehindGUI()
 	{
 		return EventSystem.current.IsPointerOverGameObject();
 	}
 
-	public static void GotoScene(string sceneName)
+	protected static void GotoScene(string sceneName)
 	{
 		Scenes.GotoScene(sceneName);
 	}

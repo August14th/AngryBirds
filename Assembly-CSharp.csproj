@@ -56,6 +56,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\AndroidClient.cs" />
+    <Compile Include="Assets\Scripts\BaseInfoPanel.cs" />
     <Compile Include="Assets\Scripts\Bird.cs" />
     <Compile Include="Assets\Scripts\BlackBird.cs" />
     <Compile Include="Assets\Scripts\Boom.cs" />
@@ -91,6 +92,8 @@
     <Compile Include="Assets\Scripts\PausePanel.cs" />
     <Compile Include="Assets\Scripts\Pig.cs" />
     <Compile Include="Assets\Scripts\PlatformClient.cs" />
+    <Compile Include="Assets\Scripts\Player.cs" />
+    <Compile Include="Assets\Scripts\Servlet.cs" />
     <Compile Include="Assets\Scripts\SlingShot.cs" />
     <Compile Include="Assets\Scripts\State.cs" />
     <Compile Include="Assets\Scripts\WinPanel.cs" />
@@ -121,6 +124,7 @@
     <None Include="Assets\Target\lose_panel.lua.txt" />
     <None Include="Assets\Target\core.global.lua.txt" />
     <None Include="Assets\Target\core.list.lua.txt" />
+    <None Include="Assets\Target\test.lua.txt" />
     <None Include="Assets\Resources\bundles.txt" />
     <None Include="Assets\Target\extends.newindex.lua.txt" />
     <None Include="Assets\XLua\Resources\xlua\util.lua.txt" />
@@ -303,6 +307,9 @@
     </Reference>
     <Reference Include="UnityEngine.StandardEvents">
       <HintPath>C:/Users/yuhel/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.standardevents@1.0.10/UnityEngine.StandardEvents.dll</HintPath>
+    </Reference>
+    <Reference Include="LitJSON">
+      <HintPath>D:/Projects/AngryBirds/Assets/Plugins/LitJSON.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

@@ -13,6 +13,10 @@ public class GameEngine : MonoBehaviour
 
 	private PlatformClient _client;
 
+	private Servlet _servlet;
+	
+	private readonly Player _player = new Player();
+
 	private IEnumerator Start()
 	{
 #if UNITY_EDITOR
@@ -22,7 +26,7 @@ public class GameEngine : MonoBehaviour
 		var bundles = gameObject.AddComponent<Bundles>();
 		bundles.StartDownloads(BundlesUri);
 		_assetLoader = bundles;
-		_client = gameObject.AddComponent<AndroidClient>(); 
+		_client = gameObject.AddComponent<AndroidClient>();
 #endif
 		while (!_assetLoader.IsDone())
 		{
@@ -31,8 +35,8 @@ public class GameEngine : MonoBehaviour
 
 		_scenes = gameObject.AddComponent<Scenes>();
 		_luaState = gameObject.AddComponent<LuaState>();
-
-		_scenes.GotoScene("Main");
+		_servlet = gameObject.AddComponent<Servlet>();
+		Client.Login();
 	}
 
 
@@ -54,5 +58,15 @@ public class GameEngine : MonoBehaviour
 	public PlatformClient Client
 	{
 		get { return _client; }
+	}
+	
+	public Player Player
+	{
+		get { return _player; }
+	}
+	
+	public Servlet Servlet
+	{
+		get { return _servlet; }
 	}
 }
